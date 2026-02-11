@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:data_shaft/data_shaft.dart';
 import 'package:data_shaft_example/data/datasource/get_user_detail_datasource.dart';
 import 'package:data_shaft_example/data/http_client/client.dart';
@@ -47,7 +49,7 @@ Future<void> main(List<String> args) async {
   );
 
   final throwDatasource = GetUserDetailDatasource(driver: throwDriver)
-    ..throwException = const UnControlDataSourceException(); // Simula crash
+    ..throwException = const UnControlDataSourceException();
 
   final throwRepository = GetUserDetailRepository(dataSource: throwDatasource);
 
