@@ -86,8 +86,7 @@ The `SafeRepositoryDatasourceCallable` catches all exceptions and converts them 
 
 ```dart
 // The Repository handles safety, mapping, and deduplication
-class GetUserDetailRepository extends SafeRepositoryDatasourceCallable<User, GetUserDataSource>
-    with DeduplicationManagement {
+final class GetUserDetailRepository extends DeduplicationRepository<User, GetUserDataSource> {
   GetUserDetailRepository({required super.dataSource});
   
   // Calling this repository returns: Future<Either<RepositoryError, User>>
