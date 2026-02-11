@@ -3,11 +3,8 @@ part of 'request_mixin.dart';
 /// A mixin that implements the [call] method for **HTTP PUT** requests.
 ///
 /// Use this mixin when the datasource is intended to replace an existing resource completely.
-mixin PutCall<
-  RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
->
-    on DatasourceRemote<RemoteObject, Driver> {
+mixin PutCall<RemoteObject extends Codable<Object, RemoteObject>,
+    Driver extends RemoteDriver> on DatasourceRemote<RemoteObject, Driver> {
   @override
   Future<RemoteObject> call({required Params params}) async {
     final putParams = generateCallRequirement(params: params);

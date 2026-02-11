@@ -34,9 +34,9 @@ abstract class DataSourceStreamable<T> extends DataSource {
   ///
   /// - [params]: The required input parameters for the stream subscription.
   /// - Returns: A [Stream] of [T] data events.
-  /// 
-  /// **Warning:** Implementations should ensure that any underlying resources 
-  /// (like web sockets or file watchers) are closed when the stream subscription 
+  ///
+  /// **Warning:** Implementations should ensure that any underlying resources
+  /// (like web sockets or file watchers) are closed when the stream subscription
   /// is cancelled or the [DataSource] is disposed.
   Stream<T> stream({required covariant Params params});
 }

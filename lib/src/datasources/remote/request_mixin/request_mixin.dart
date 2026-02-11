@@ -20,11 +20,11 @@ Uri _obtainUriWithParams(RequestParams? params, Uri uri) {
   // Logic to merge existing query params with new ones
   final queryParams =
       (uri.queryParameters.isNotEmpty || (urlParams?.isNotEmpty ?? false))
-      ? {
-          if (uri.queryParameters.isNotEmpty) ...uri.queryParameters,
-          if (urlParams != null) ...urlParams,
-        }
-      : null;
+          ? {
+              if (uri.queryParameters.isNotEmpty) ...uri.queryParameters,
+              if (urlParams != null) ...urlParams,
+            }
+          : null;
 
   return Uri(
     host: uri.host,

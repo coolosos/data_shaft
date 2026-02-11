@@ -6,11 +6,8 @@ part of 'request_mixin.dart';
 ///
 /// While DELETE requests typically do not contain a body, this implementation
 /// supports passing a body via [DeleteParams] if the server API requires it.
-mixin DeleteCall<
-  RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
->
-    on DatasourceRemote<RemoteObject, Driver> {
+mixin DeleteCall<RemoteObject extends Codable<Object, RemoteObject>,
+    Driver extends RemoteDriver> on DatasourceRemote<RemoteObject, Driver> {
   @override
   Future<RemoteObject> call({required Params params}) async {
     final deleteParams = generateCallRequirement(params: params);

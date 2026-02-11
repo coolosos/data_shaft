@@ -4,11 +4,8 @@ part of 'request_mixin.dart';
 ///
 /// Use this mixin when the datasource is intended to create new resources on the server.
 /// It handles the serialization of the body via [PostParams.encodeBody].
-mixin PostCall<
-  RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
->
-    on DatasourceRemote<RemoteObject, Driver> {
+mixin PostCall<RemoteObject extends Codable<Object, RemoteObject>,
+    Driver extends RemoteDriver> on DatasourceRemote<RemoteObject, Driver> {
   @override
   Future<RemoteObject> call({required Params params}) async {
     final postParams = generateCallRequirement(params: params);

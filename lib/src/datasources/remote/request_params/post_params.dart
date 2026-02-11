@@ -22,19 +22,17 @@ base class PostParams extends RequestParams {
     Encoding encoding = utf8,
     super.urlParams,
   }) : super(
-         encoding: encoding,
-         encodeBody: () => formFields.entries
-             .map((field) {
-               final key = Uri.encodeQueryComponent(
-                 field.key,
-                 encoding: encoding,
-               );
-               final value = Uri.encodeQueryComponent(
-                 field.value,
-                 encoding: encoding,
-               );
-               return '$key=$value';
-             })
-             .join('&'),
-       );
+          encoding: encoding,
+          encodeBody: () => formFields.entries.map((field) {
+            final key = Uri.encodeQueryComponent(
+              field.key,
+              encoding: encoding,
+            );
+            final value = Uri.encodeQueryComponent(
+              field.value,
+              encoding: encoding,
+            );
+            return '$key=$value';
+          }).join('&'),
+        );
 }

@@ -1,7 +1,7 @@
 import 'package:cool_bedrock/cool_bedrock.dart' show RepositoryError;
 
 /// {@template data_shaft.on_exception_repository_error}
-/// Error representing a **failure during the orchestration or transformation** 
+/// Error representing a **failure during the orchestration or transformation**
 /// within the Repository.
 ///
 /// Unlike inadmissible errors, this typically occurs when the Data Source succeeds

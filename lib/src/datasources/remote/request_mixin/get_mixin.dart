@@ -4,11 +4,8 @@ part of 'request_mixin.dart';
 ///
 /// Use this mixin for obtaining a resource. It ensures the request
 /// follows the GET semantics.
-mixin GetCall<
-  RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
->
-    on DatasourceRemote<RemoteObject, Driver> {
+mixin GetCall<RemoteObject extends Codable<Object, RemoteObject>,
+    Driver extends RemoteDriver> on DatasourceRemote<RemoteObject, Driver> {
   @override
   Future<RemoteObject> call({required Params params}) async {
     final requestParams = generateCallRequirement(params: params);
