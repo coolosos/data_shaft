@@ -1,6 +1,5 @@
 part of 'repository_observer_instances.dart';
 
-/// Tag helper para mantener consistencia en los nombres de los logs
 String _repoTag(String name) => 'REPO.$name';
 
 class _DefaultRepositoryImp implements RepositoryDataSourceCallableObserver {

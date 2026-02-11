@@ -76,7 +76,6 @@ void main() {
 
   group('Repository Observer Integration Tests', () {
     test('Should notify onCreate when repository is instantiated', () {
-      // El setup ya instanció el repo, por lo que onCreate debió llamarse
       expect(observer.onCreateCalled, true);
     });
 
@@ -84,12 +83,10 @@ void main() {
       await repository.call(repositoryParams: const UserParams(id: '1'));
 
       expect(observer.beforeCallCalled, true);
-      // El nombre del callable debe ser el nombre de la clase del repositorio
       expect(observer.lastCallableName, contains('UserRepositoryMock'));
     });
 
     test('Should notify onException when an unexpected error occurs', () async {
-      // Forzamos un error genérico
       final datasource = UserDataSourceThrowMock()
         ..errorToThrow = Exception('Generic Error');
 

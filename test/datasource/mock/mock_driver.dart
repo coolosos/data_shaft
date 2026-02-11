@@ -5,11 +5,9 @@ import 'package:cool_bedrock/cool_bedrock.dart';
 import 'package:data_shaft/src/datasources/driver/remote_driver.dart';
 import 'package:data_shaft/src/datasources/remote/request_response/request_response.dart';
 
-/// Modelo simple para las pruebas
 class MockModel extends Codable<String, MockModel> {
   const MockModel({required this.name});
 
-  // En un entorno real usarías un factory, aquí simulamos la transformación
   factory MockModel.fromJson(String body) {
     final map = json.decode(body) as Map<String, dynamic>;
     return MockModel(name: map['name'] as String);
@@ -35,7 +33,6 @@ class MockModel extends Codable<String, MockModel> {
   Encoding? get stringEncoding => throw UnimplementedError();
 }
 
-/// Driver manual para capturar qué se envía a la "red"
 class MockRemoteDriver implements RemoteDriver {
   RequestResponse? simulatedResponse;
   Uri? lastUri;
@@ -67,7 +64,6 @@ class MockRemoteDriver implements RemoteDriver {
     return simulatedResponse!;
   }
 
-  // Implementar put, patch, delete de forma similar si es necesario...
   @override
   Future<RequestResponse> delete(
     Uri uri, {

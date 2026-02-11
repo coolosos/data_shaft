@@ -136,7 +136,7 @@ abstract class DatasourceRemote<
 
   ///Usually use after server call to return the required data or failure.
   ///
-  ///By default, [transformation] function will be call afer success response.
+  ///By default, [transformation] function will be call after success response.
   @mustCallSuper
   FutureOr<RemoteObject> checkInformation({
     required RequestResponse requestResponse,

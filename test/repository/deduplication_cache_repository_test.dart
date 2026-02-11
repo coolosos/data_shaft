@@ -76,7 +76,6 @@ void main() {
     test(
         'Should return UnControlRepositoryError when DataSource throws UnControlDataSourceException',
         () async {
-      // Simulamos un error 500 o similar
       dataSourceThrowMock.errorToThrow = const UnControlDataSourceException(
         message: 'Server Error',
         statusCode: 500,
@@ -86,7 +85,6 @@ void main() {
         repositoryParams: const UserParams(id: '1'),
       );
 
-      // Verificamos que sea un Left con el tipo de error correcto
       expect(result.isLeft(), true);
       result.fold(
         (error) => expect(error, isA<UnControlRepositoryError>()),
@@ -97,7 +95,6 @@ void main() {
     test(
         'Should return InadmissibleRepositoryError when DataSource throws InadmissibleDataSourceException',
         () async {
-      // Simulamos un 404 o 401
       dataSourceThrowMock.errorToThrow = const InadmissibleDataSourceException(
         message: 'Not Found',
         body: 'Not Found',
@@ -118,7 +115,6 @@ void main() {
     test(
         'Should return OnExceptionRepositoryError for unexpected generic exceptions',
         () async {
-      // Simulamos un error de programación (e.g. TypeError o NullThrownError)
       dataSourceThrowMock.errorToThrow = Exception('Unexpected logic error');
 
       final result = await repositoryThrow.call(
@@ -133,13 +129,11 @@ void main() {
     });
 
     test('Should NOT cache the result if the call fails', () async {
-      // Forzamos un fallo
       dataSourceThrowMock.errorToThrow = Exception('Network down');
       await repositoryThrow.call(repositoryParams: const UserParams(id: '1'));
 
       expect(repositoryThrow.isCached(), false);
 
-      // Si luego la red vuelve, debería llamar al DataSource de nuevo (no hay cache)
       dataSourceThrowMock.errorToThrow = null;
       await repositoryThrow.call(repositoryParams: const UserParams(id: '1'));
 
@@ -159,7 +153,7 @@ void main() {
 
       expect(results[0].isLeft(), true);
       expect(results[1].isLeft(), true);
-      // Ambos deben ser el mismo tipo de error
+
       expect(results[0], results[1]);
     });
   });

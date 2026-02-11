@@ -119,8 +119,6 @@ class GetUserDetailRepository extends RepositoryDataSourceCallable<User, GetUser
     );
   }
 
-  // --- Implementación de los mapeadores de errores requeridos por SafeRepositoryHelper ---
-
   @override
   RepositoryError Function(InadmissibleDataSourceException, StackTrace)
       get onInadmissibleException => (exception, stackTrace) {

@@ -36,7 +36,6 @@ void main() {
           () {
         final uri = dataSource.uri;
 
-        // Verificamos que reemplazó :id por 123
         expect(uri.toString(), 'https://api.test.com/users/123');
       });
 
@@ -50,7 +49,6 @@ void main() {
 
         await dataSource.call(params: const NoParams());
 
-        // Verificamos que el URI final lleva los urlParams del GetParams
         expect(driver.lastUri.toString(), contains('version=1'));
       });
 

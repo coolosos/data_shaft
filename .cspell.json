@@ -15,10 +15,12 @@
                 "datasource",
                 "endtemplate",
                 "fpdart",
+                "github",
                 "pubspec",
                 "Rubio",
                 "rxdart",
                 "streamable",
+                "uncontrol",
                 "usecase"
         ],
         "useGitignore": true,
