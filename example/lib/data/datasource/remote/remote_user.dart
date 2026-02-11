@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:data_shaft/data_shaft.dart';
 
 class RemoteUser extends Codable<String, RemoteUser> {
