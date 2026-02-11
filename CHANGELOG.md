@@ -1,7 +1,3 @@
-## 1.0.1 - 2026-2-11
-- ✏️ Example and documentation
-- ✏️ Test coverage
-
 ## 1.0.0 - 2026-2-11
 
 - Initial version.
