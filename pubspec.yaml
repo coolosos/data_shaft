@@ -1,5 +1,5 @@
 name: data_shaft
-description: Cornerstone for building a robust and decoupled Data Layer within a Clean Architecture setup. This package provides all the essential abstractions (interfaces and base models) required to define the contract of the Data Layer, without concerning itself with concrete implementation details.
+description: High-level data layer framework for Clean Architecture. Features standardized Drivers, typed DataSources, and advanced Repository mixins for caching, deduplication, and safe error handling.
 version: 1.0.0
 
 homepage: https://github.com/coolosos
@@ -12,15 +12,15 @@ topics:
   - clean-architecture
   - repository
   - abstraction
-  - core
+  - architecture
 
 environment:
-  sdk: ^3.8.1
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   meta: any
   cool_bedrock: 1.0.0
 
 dev_dependencies:
-  coolint: any
+  coolint: 2.1.2
   test: any

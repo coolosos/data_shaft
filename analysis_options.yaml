@@ -1,0 +1,11 @@
+include: package:coolint/coolint.yaml
+analyzer:
+  exclude:
+    - "/**/.github/**"
+
+  plugins:
+    - custom_lint
+linter:
+  rules:
+    depend_on_referenced_packages: false
+    avoid_positional_boolean_parameters: false
