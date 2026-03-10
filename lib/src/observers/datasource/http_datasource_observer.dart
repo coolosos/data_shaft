@@ -12,6 +12,16 @@ abstract interface class HttpDatasourceObserver implements SimpleObserver {
   /// {@macro data_shaft.http_datasource_observer}
   const HttpDatasourceObserver();
 
+  @mustCallSuper
+  void onDriverException(
+    Object error,
+    StackTrace stackTrace, {
+    required String datasourceName,
+    Map<String, String>? requestHeaders,
+    Uri? requestUri,
+    Object? requestBody,
+  });
+
   /// Called when the server returns a status code defined in `inadmissibleStatusCode`.
   /// Use this to log expected business errors (e.g., 404 Not Found).
   @mustCallSuper
