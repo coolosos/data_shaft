@@ -194,12 +194,71 @@ abstract class DatasourceRemote<
   }
 
   ///Generate a request params from repository or usecase params
-  RequestParams? generateCallRequirement({required covariant Params params});
+  RequestParams generateCallRequirement({required covariant Params params});
+
+  /// Centralized method to handle all HTTP requests.
+  @protected
+  Future<RemoteObject> request(RequestParams requestParams) async {
+    final callUri = requestParams.modifyUriWithUrlParams(uri);
+
+    final body = requestParams.encodeBody?.call();
+
+    observer.onCall(
+      callUri,
+      body: body?.toString(),
+      datasourceName: runtimeType.toString(),
+    );
+
+    final RequestResponse response;
+    try {
+      response = await switch (requestParams) {
+        DeleteParams() => driver.delete(
+            callUri,
+            headers: requestParams.headers,
+            body: body,
+          ),
+        PutParams() => driver.put(
+            callUri,
+            headers: requestParams.headers,
+            body: body,
+          ),
+        GetParams() => driver.get(callUri, headers: requestParams.headers),
+        PatchParams() => driver.patch(
+            callUri,
+            headers: requestParams.headers,
+            body: body,
+          ),
+        PostParams() => driver.post(
+            callUri,
+            headers: requestParams.headers,
+            body: body,
+          ),
+      };
+    } catch (error, stackTrace) {
+      observer.onDriverException(
+        error,
+        stackTrace,
+        datasourceName: runtimeType.toString(),
+        requestBody: body?.toString(),
+        requestUri: callUri,
+        requestHeaders: requestParams.headers,
+      );
+      rethrow;
+    }
+    return checkInformation(
+      requestResponse: response,
+      requestHeaders: requestParams.headers,
+      requestUri: callUri,
+      requestBody: body,
+    );
+  }
 
   ///Manage the server connection.
   ///
   ///Usually use with [checkInformation] function for control server answer.
   // Future<Info> call({required covariant Params params});
   @override
-  Future<RemoteObject> call({required covariant Params params});
+  Future<RemoteObject> call({required covariant Params params}) {
+    return request(generateCallRequirement(params: params));
+  }
 }

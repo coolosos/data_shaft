@@ -95,4 +95,21 @@ final class _HttpDatasourceObserverImpl implements HttpDatasourceObserver {
       );
     }
   }
+
+  @override
+  void onDriverException(
+    Object error,
+    StackTrace stackTrace, {
+    required String datasourceName,
+    Map<String, String>? requestHeaders,
+    Uri? requestUri,
+    Object? requestBody,
+  }) {
+    log(
+      '💡 DRIVER EXCEPTION: $requestUri\n'
+      'Headers: $requestHeaders\n'
+      'body: $requestBody',
+      name: _tagName(datasourceName),
+    );
+  }
 }

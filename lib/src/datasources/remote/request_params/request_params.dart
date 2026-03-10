@@ -50,4 +50,29 @@ sealed class RequestParams {
   /// Example:
   /// If [urlParams] is `{'startAt': 'now'}`, the URI will become `api/path?startAt=now`.
   final Map<String, dynamic>? urlParams;
+
+  /// Helper function to merge the base [uri] with specific [RequestParams].
+  ///
+  /// It combines the query parameters present in the base [uri] with those provided
+  /// in [urlParams].
+  Uri modifyUriWithUrlParams(Uri uri) {
+    final urlParams = this.urlParams;
+
+    // Logic to merge existing query params with new ones
+    final queryParams =
+        (uri.queryParameters.isNotEmpty || (urlParams?.isNotEmpty ?? false))
+            ? {
+                if (uri.queryParameters.isNotEmpty) ...uri.queryParameters,
+                if (urlParams != null) ...urlParams,
+              }
+            : null;
+
+    return Uri(
+      host: uri.host,
+      port: uri.port,
+      path: uri.path,
+      scheme: uri.scheme,
+      queryParameters: queryParams,
+    );
+  }
 }
