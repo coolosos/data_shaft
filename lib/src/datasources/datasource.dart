@@ -32,7 +32,6 @@ abstract class DataSource {
   ///
   /// Subclasses that override this method **must** call `super.dispose()`
   /// to ensure the observer is properly notified of the disposal.
-  @mustCallSuper
   void dispose() {
     datasourceObserver.onDispose(runtimeType.toString());
   }

@@ -1,10 +1,12 @@
+## 1.0.2 - 2026-4-10
+### Added
+- Remote datasource request function for unify observer and logic
+
 ## 1.0.1 - 2026-4-10
 ### Fix
 - Datasource drive now request the generic
 
-
 ## 1.0.0 - 2026-2-11
-
 - Initial version.
 ### Added
 - Datasource abstract
