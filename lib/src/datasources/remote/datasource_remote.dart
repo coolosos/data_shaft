@@ -68,7 +68,7 @@ abstract class DatasourceRemote<
   ///
   /// This driver is responsible for managing the connection lifecycle and
   /// executing the low-level transport protocol.
-  final RemoteDriver driver;
+  final Driver driver;
 
   String _buildPath() {
     final prefix = pathPrefix ?? '';
