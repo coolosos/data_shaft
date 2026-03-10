@@ -1,6 +1,6 @@
 name: data_shaft
-description: High-level data layer framework for Clean Architecture. Features standardized Drivers, typed DataSources, and advanced Repository mixins for caching, deduplication, and safe error handling.
-version: 1.0.0
+description: High-level data layer for Clean Architecture with standardized Drivers, typed DataSources, and Repository mixins for caching, deduplication, and safe error handling.
+version: 1.0.1
 
 homepage: https://github.com/coolosos
 
