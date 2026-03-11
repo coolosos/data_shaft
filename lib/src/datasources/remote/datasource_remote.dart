@@ -132,7 +132,7 @@ abstract class DatasourceRemote<
   ///Transform the information of response.body in [RemoteObject] object.
   ///This function is required because factory of T is not possible.
   FutureOr<RemoteObject> transformation({
-    required RequestResponse remoteResponse,
+    required covariant RequestResponse remoteResponse,
   });
 
   ///Usually use after server call to return the required data or failure.
@@ -140,7 +140,7 @@ abstract class DatasourceRemote<
   ///By default, [transformation] function will be call after success response.
   @mustCallSuper
   FutureOr<RemoteObject> checkInformation({
-    required RequestResponse requestResponse,
+    required covariant RequestResponse requestResponse,
     required Map<String, String>? requestHeaders,
     required Uri? requestUri,
     Object? requestBody,

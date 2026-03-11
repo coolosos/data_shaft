@@ -1,3 +1,7 @@
+## 1.1.3
+### Added
+- Datasource Remote covariant in transform and checkInformation for improve modifications
+
 ## 1.1.2
 ### Dependencies
 - Cool_bedrock breaking change dependence
