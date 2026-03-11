@@ -11,7 +11,7 @@ import 'driver.dart';
 /// (e.g., `http`, `dio`, `graphql`). It provides explicit methods for standard HTTP verbs
 /// to facilitate debugging and clearer stack traces.
 /// {@endtemplate}
-abstract interface class RemoteDriver extends Driver {
+abstract interface class RemoteDriver<OriginalResponse> extends Driver {
   /// {@macro data_shaft.remote_driver}
   const RemoteDriver();
 
@@ -23,7 +23,7 @@ abstract interface class RemoteDriver extends Driver {
   /// - [headers]: Optional HTTP headers.
   /// - [options]: Extra configuration specific to the underlying client implementation
   ///   (e.g., `dio.Options`, timeouts, cancel tokens).
-  Future<RequestResponse> head(
+  Future<RequestResponse<OriginalResponse>> head(
     Uri url, {
     Map<String, String>? headers,
     Object? options,
@@ -34,7 +34,7 @@ abstract interface class RemoteDriver extends Driver {
   /// - [url]: The target URI.
   /// - [headers]: Optional HTTP headers.
   /// - [options]: Extra configuration specific to the underlying client implementation.
-  Future<RequestResponse> get(
+  Future<RequestResponse<OriginalResponse>> get(
     Uri url, {
     Map<String, String>? headers,
     Object? options,
@@ -47,7 +47,7 @@ abstract interface class RemoteDriver extends Driver {
   /// - [body]: The payload to send. Can be a Map, List, or raw String.
   /// - [encoding]: The encoding to use for the body (defaults to UTF-8 in most clients).
   /// - [options]: Extra configuration specific to the underlying client implementation.
-  Future<RequestResponse> post(
+  Future<RequestResponse<OriginalResponse>> post(
     Uri url, {
     Map<String, String>? headers,
     Object? body,
@@ -62,7 +62,7 @@ abstract interface class RemoteDriver extends Driver {
   /// - [body]: The payload to replace the resource with.
   /// - [encoding]: The encoding to use for the body.
   /// - [options]: Extra configuration specific to the underlying client implementation.
-  Future<RequestResponse> put(
+  Future<RequestResponse<OriginalResponse>> put(
     Uri url, {
     Map<String, String>? headers,
     Object? body,
@@ -77,7 +77,7 @@ abstract interface class RemoteDriver extends Driver {
   /// - [body]: The payload containing the changes.
   /// - [encoding]: The encoding to use for the body.
   /// - [options]: Extra configuration specific to the underlying client implementation.
-  Future<RequestResponse> patch(
+  Future<RequestResponse<OriginalResponse>> patch(
     Uri url, {
     Map<String, String>? headers,
     Object? body,
@@ -92,7 +92,7 @@ abstract interface class RemoteDriver extends Driver {
   /// - [body]: Optional payload (some APIs require a body for deletion).
   /// - [encoding]: The encoding to use for the body.
   /// - [options]: Extra configuration specific to the underlying client implementation.
-  Future<RequestResponse> delete(
+  Future<RequestResponse<OriginalResponse>> delete(
     Uri url, {
     Map<String, String>? headers,
     Object? body,

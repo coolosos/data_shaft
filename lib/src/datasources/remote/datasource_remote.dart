@@ -148,7 +148,7 @@ abstract class DatasourceRemote<
     if (inadmissibleStatusCode.contains(requestResponse.statusCode)) {
       observer.onInadmissibleException(
         requestResponse.statusCode,
-        requestResponse.body ?? '',
+        requestResponse.body?.call() ?? '',
         requestResponse.originalResponse,
         List.from(inadmissibleStatusCode),
         datasourceName: runtimeType.toString(),
@@ -159,7 +159,7 @@ abstract class DatasourceRemote<
 
       throw InadmissibleDataSourceException(
         statusCode: requestResponse.statusCode,
-        body: requestResponse.body ?? '',
+        body: requestResponse.body?.call() ?? '',
         requestBody: requestBody,
         requestHeaders: requestHeaders,
         requestUri: requestUri,
@@ -168,7 +168,7 @@ abstract class DatasourceRemote<
     if (!admissibleStatusCode.contains(requestResponse.statusCode)) {
       observer.onUnControlException(
         requestResponse.statusCode,
-        requestResponse.body ?? '',
+        requestResponse.body?.call() ?? '',
         requestResponse.originalResponse,
         List.from(inadmissibleStatusCode),
         List.from(admissibleStatusCode),

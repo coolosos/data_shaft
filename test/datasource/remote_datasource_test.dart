@@ -41,9 +41,9 @@ void main() {
 
       test('Should merge query parameters from generateCallRequirement',
           () async {
-        driver.simulatedResponse = const RequestResponse(
+        driver.simulatedResponse = RequestResponse(
           statusCode: 200,
-          body: '{"name": "Test User"}',
+          body: () => '{"name": "Test User"}',
           originalResponse: null,
         );
 
@@ -55,9 +55,9 @@ void main() {
       test(
           'Should throw InadmissibleDataSourceException on defined inadmissible code',
           () async {
-        driver.simulatedResponse = const RequestResponse(
+        driver.simulatedResponse = RequestResponse(
           statusCode: 404,
-          body: 'Not Found',
+          body: () => 'Not Found',
           originalResponse: null,
         );
 
@@ -69,9 +69,9 @@ void main() {
 
       test('Should throw UnControlDataSourceException on non-admissible code',
           () async {
-        driver.simulatedResponse = const RequestResponse(
+        driver.simulatedResponse = RequestResponse(
           statusCode: 500,
-          body: 'Internal Server Error',
+          body: () => 'Internal Server Error',
           originalResponse: null,
         );
 
@@ -82,9 +82,9 @@ void main() {
       });
 
       test('Should return transformed object on success (200)', () async {
-        driver.simulatedResponse = const RequestResponse(
+        driver.simulatedResponse = RequestResponse(
           statusCode: 200,
-          body: '{"name": "Dart User"}',
+          body: () => '{"name": "Dart User"}',
           originalResponse: null,
         );
 

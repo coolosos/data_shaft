@@ -8,9 +8,10 @@ import 'package:data_shaft_example/data/repository/get_user_detail_repository.da
 
 Future<void> main(List<String> args) async {
   final successfulDriver = HttpDriver(
-    simulatedResponse: const RequestResponse(
+    simulatedResponse: RequestResponse(
       statusCode: 200,
-      body: '{"name": "Dart User"}',
+      body: () => '{"name": "Dart User"}',
+      originalResponse: null,
     ),
   );
 
@@ -45,7 +46,8 @@ Future<void> main(List<String> args) async {
   print('\n--- Throw/Error request set ---');
 
   final throwDriver = HttpDriver(
-    simulatedResponse: const RequestResponse(statusCode: 404),
+    simulatedResponse:
+        const RequestResponse(statusCode: 404, originalResponse: null),
   );
 
   final throwDatasource = GetUserDetailDatasource(driver: throwDriver)

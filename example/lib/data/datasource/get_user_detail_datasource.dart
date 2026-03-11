@@ -42,6 +42,6 @@ final class GetUserDetailDatasource
 
   @override
   RemoteUser transformation({required RequestResponse remoteResponse}) {
-    return RemoteUser.fromJson(remoteResponse.body!);
+    return RemoteUser.fromJson(remoteResponse.body?.call() ?? '');
   }
 }

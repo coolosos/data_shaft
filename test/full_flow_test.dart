@@ -21,9 +21,9 @@ void main() {
       refreshDuration: const Duration(minutes: 5),
     );
 
-    driver.simulatedResponse = const RequestResponse(
+    driver.simulatedResponse = RequestResponse(
       statusCode: 200,
-      body: '{"name": "Data Shaft User"}',
+      body: () => '{"name": "Data Shaft User"}',
       originalResponse: null,
     );
 
