@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   meta: ^1.17.0
-  cool_bedrock: ^1.0.0
+  cool_bedrock: ^2.0.0
   data_shaft:
     path: ../
 

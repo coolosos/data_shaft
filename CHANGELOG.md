@@ -1,3 +1,7 @@
+## 1.1.2
+### Dependencies
+- Cool_bedrock breaking change dependence
+
 ## 1.1.1
 ### Added
 - RequestResponse now have a generic for originalResponse field
@@ -14,7 +18,7 @@
 ### Fix
 - Datasource drive now request the generic
 
-## 1.0.0 å
+## 1.0.0
 - Initial version.
 ### Added
 - Datasource abstract

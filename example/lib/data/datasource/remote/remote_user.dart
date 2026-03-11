@@ -25,5 +25,5 @@ class RemoteUser extends Codable<String, RemoteUser> {
   JsonCodec? get serializer => null;
 
   @override
-  Encoding? get stringEncoding => null;
+  Encoding? get encoding => null;
 }
