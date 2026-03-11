@@ -1,6 +1,10 @@
-## 1.0.2 - 2026-4-10
-### Added
-- Remote datasource request function for unify observer and logic
+## 1.1.0 - 2026-4-10
+### ⚠️ BREAKING CHANGES
+- **Observer Hierarchy Refactor**: `HttpDatasourceObserver` now implements `SimpleDatasourceObserver` instead of `SimpleObserver`.
+    * **Impact**: It is no longer necessary to implement two observers if you want the same information in common methods such as onCreate and onDispose.
+    * **Reasoning**: This change enables `DatasourceObserverInstances` to use the HTTP observer as a fallback for basic lifecycle events, reducing boilerplate configuration for users.
+### Fix
+- Correct use of observer in `DatasourceRemote`. The default debugPrint for datasource creation will no longer appear.
 
 ## 1.0.1 - 2026-4-10
 ### Fix

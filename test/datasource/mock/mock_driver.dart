@@ -35,6 +35,7 @@ class MockModel extends Codable<String, MockModel> {
 
 class MockRemoteDriver implements RemoteDriver {
   RequestResponse? simulatedResponse;
+  Error? throwable;
   Uri? lastUri;
   Object? lastBody;
   Map<String, String>? lastHeaders;
@@ -47,6 +48,9 @@ class MockRemoteDriver implements RemoteDriver {
   }) async {
     lastUri = uri;
     lastHeaders = headers;
+    if (throwable case final throwable?) {
+      throw throwable;
+    }
     return simulatedResponse!;
   }
 
@@ -61,6 +65,9 @@ class MockRemoteDriver implements RemoteDriver {
     lastUri = uri;
     lastBody = body;
     lastHeaders = headers;
+    if (throwable case final throwable?) {
+      throw throwable;
+    }
     return simulatedResponse!;
   }
 
