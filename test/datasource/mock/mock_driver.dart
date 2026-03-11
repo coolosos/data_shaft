@@ -30,7 +30,7 @@ class MockModel extends Codable<String, MockModel> {
   JsonCodec? get serializer => throw UnimplementedError();
 
   @override
-  Encoding? get stringEncoding => throw UnimplementedError();
+  Encoding? get encoding => throw UnimplementedError();
 }
 
 class MockRemoteDriver implements RemoteDriver {
