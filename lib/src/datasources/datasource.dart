@@ -15,7 +15,7 @@ import '../observers/datasource/datasource_observer_instances.dart';
 abstract class DataSource {
   /// {@macro data_shaft.datasource}
   DataSource() {
-    datasourceObserver.onCreate(runtimeType.toString());
+    observer.onCreate(runtimeType.toString());
   }
 
   /// Retrieves the standard observer instance used to track the lifecycle
@@ -24,15 +24,15 @@ abstract class DataSource {
   /// The observer is intended for internal tracking and should not be accessed directly by layers outside
   /// the Data implementation package.
   @protected
-  SimpleObserver get datasourceObserver =>
-      DatasourceObserverInstances.datasourceObserver;
+  SimpleObserver get observer => DatasourceObserverInstances.datasourceObserver;
 
   /// Called when the [DataSource] instance is no longer needed and should
   /// release any held resources (e.g., closing connections, unregistering listeners).
   ///
   /// Subclasses that override this method **must** call `super.dispose()`
   /// to ensure the observer is properly notified of the disposal.
+  @mustCallSuper
   void dispose() {
-    datasourceObserver.onDispose(runtimeType.toString());
+    observer.onDispose(runtimeType.toString());
   }
 }

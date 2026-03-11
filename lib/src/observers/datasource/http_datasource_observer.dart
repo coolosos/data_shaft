@@ -8,7 +8,8 @@ part of 'datasource_observer_instances.dart';
 /// 2. The moment the call is triggered.
 /// 3. The result (Successful, Inadmissible, or Uncontrolled).
 /// {@endtemplate}
-abstract interface class HttpDatasourceObserver implements SimpleObserver {
+abstract interface class HttpDatasourceObserver
+    implements SimpleDatasourceObserver {
   /// {@macro data_shaft.http_datasource_observer}
   const HttpDatasourceObserver();
 
