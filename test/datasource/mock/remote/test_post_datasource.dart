@@ -36,6 +36,6 @@ final class TestPostDataSource
 
   @override
   MockModel transformation({required RequestResponse remoteResponse}) {
-    return MockModel.fromJson(remoteResponse.body!);
+    return MockModel.fromJson(remoteResponse.body!());
   }
 }

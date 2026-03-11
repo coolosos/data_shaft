@@ -5,13 +5,13 @@
 /// underlying HTTP client (such as Dio, http, or Chopper) into a format
 /// that [DatasourceRemote] can process consistently.
 /// {@endtemplate}
-class RequestResponse {
+class RequestResponse<OriginalResponse> {
   /// {@macro data_shaft.request_response}
   const RequestResponse({
     required this.statusCode,
+    required this.originalResponse,
     this.body,
     this.headers = const {},
-    this.originalResponse,
   });
 
   /// The HTTP status code (e.g., 200, 404, 500).
@@ -24,7 +24,7 @@ class RequestResponse {
   ///
   /// Usually contains a [String] (JSON/XML) or a decoded [Map]/[List]
   /// depending on how the [RemoteDriver] is configured.
-  final String? body;
+  final String Function()? body;
 
   /// The HTTP response headers returned by the server.
   final Map<String, String> headers;
@@ -36,5 +36,5 @@ class RequestResponse {
   /// * Debugging and logging.
   /// * Accessing client-specific features not covered by this adapter.
   /// * Advanced manual parsing if needed.
-  final Object? originalResponse;
+  final OriginalResponse originalResponse;
 }
