@@ -149,5 +149,66 @@ void main() {
 
       expect(dataSource.uri.path, '/api/users');
     });
+
+    test('Should use default inadmissibleStatusCode when not overridden',
+        () async {
+      driver.simulatedResponse = RequestResponse(
+        statusCode: 200,
+        body: () => '{"name": "Test"}',
+        originalResponse: null,
+      );
+
+      final dataSource = PathTestDataSource(
+        driver: driver,
+        customPath: '/users',
+        customPrefix: '',
+      );
+
+      final result = await dataSource.call(params: const NoParams());
+      expect(result, isA<MockModel>());
+    });
   });
+
+  group('DatasourceRemote Body Coverage', () {
+    test('Should pass body to observer call and driver exception', () async {
+      final driver = MockRemoteDriver()
+        ..simulatedResponse = RequestResponse(
+          statusCode: 200,
+          body: () => '{"name": "Test"}',
+          originalResponse: null,
+        );
+
+      final dataSource = _BodyTestDataSource(driver: driver);
+
+      await dataSource.call(params: const NoParams());
+
+      driver.throwable = UnimplementedError();
+      expect(
+        () => dataSource.call(params: const NoParams()),
+        throwsA(isA<Error>()),
+      );
+    });
+  });
+}
+
+final class _BodyTestDataSource
+    extends DatasourcePostRemote<MockModel, MockRemoteDriver> {
+  _BodyTestDataSource({required super.driver});
+
+  @override
+  String get host => 'https://api.test.com';
+
+  @override
+  String? get path => '/test';
+
+  @override
+  Set<int> get admissibleStatusCode => {200};
+
+  @override
+  PostParams generateCallRequirement({required Params params}) =>
+      PostParams(encodeBody: () => '{"key": "value"}');
+
+  @override
+  MockModel transformation({required RequestResponse remoteResponse}) =>
+      const MockModel(name: 'test');
 }

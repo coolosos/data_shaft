@@ -1,3 +1,15 @@
+## 2.0.0
+### ⚠️ BREAKING CHANGES
+- **`List<int>` → `Set<int>` for status codes**: `inadmissibleStatusCode` and `admissibleStatusCode` in `DatasourceRemote` and observer interfaces now return `Set<int>` instead of `List<int>`.
+    * **Impact**: Existing observer implementations that use `List<int>` as parameter types must update to `Set<int>`.
+    * **Reasoning**: `Set<int>` better represents unique status codes and eliminates unnecessary `List.from()` allocations.
+- **Observer naming & timing**: Repository observer methods deprecated `name` → `repositoryName`, `callableName` → `datasourceName`; `beforeCall` now receives `startTime`, `afterCall` receives `endTime` and `elapsed`.
+- **`@mustCallSuper` removed**: Removed from all abstract interface methods (no effect on pure interfaces).
+### Added
+- `useHigherObserver` flag in `DatasourceObserverInstances` and `RepositoryObserverInstances` to enable fallback chains.
+- `Set.unmodifiable()` wrapping around status codes passed to observer methods (prevents mutation).
+- `reset()` method on both observer registries for test isolation.
+
 ## 1.1.3
 ### Added
 - Datasource Remote covariant in transform and checkInformation for improve modifications

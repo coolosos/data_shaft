@@ -30,17 +30,25 @@ abstract class RepositoryDataSourceCallable<ValueType,
   FutureOr<Either<RepositoryError, ValueType>> call({
     required covariant Params repositoryParams,
   }) async {
+    final startTime = DateTime.now();
+
     observer.beforeCall(
       runtimeType.toString(),
       dataSource.runtimeType.toString(),
+      startTime: startTime,
     );
 
     final data = await dataSource.call(params: repositoryParams);
+
+    final endTime = DateTime.now();
+    final elapsed = endTime.difference(startTime);
 
     observer.afterCall(
       runtimeType.toString(),
       dataSource.runtimeType.toString(),
       data,
+      endTime: endTime,
+      elapsed: elapsed,
     );
     return Right(data);
   }

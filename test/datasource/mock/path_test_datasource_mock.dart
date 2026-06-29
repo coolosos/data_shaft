@@ -20,7 +20,7 @@ final class PathTestDataSource
   String? get pathPrefix => customPrefix;
 
   @override
-  List<int> get admissibleStatusCode => [200];
+  Set<int> get admissibleStatusCode => {200};
   @override
   MockModel transformation({required RequestResponse remoteResponse}) =>
       const MockModel(name: '');

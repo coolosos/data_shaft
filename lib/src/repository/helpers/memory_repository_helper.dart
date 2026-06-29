@@ -46,10 +46,7 @@ mixin MemoryCacheHelper<Info> {
     }
     final actualTime = DateTime.now();
     final diff = actualTime.difference(timeStamp ?? actualTime);
-    if (diff.inMilliseconds >= refreshDuration.inMilliseconds) {
-      return true;
-    }
-    return false;
+    return diff >= refreshDuration;
   }
 
   /// Returns `true` if there is data in the cache (regardless of expiration).
