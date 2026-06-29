@@ -67,12 +67,6 @@ sealed class RequestParams {
               }
             : null;
 
-    return Uri(
-      host: uri.host,
-      port: uri.port,
-      path: uri.path,
-      scheme: uri.scheme,
-      queryParameters: queryParams,
-    );
+    return uri.replace(queryParameters: queryParams);
   }
 }

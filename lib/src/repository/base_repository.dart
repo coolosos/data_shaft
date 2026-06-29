@@ -15,17 +15,18 @@ import '../observers/repository/repository_observer_instances.dart';
 abstract class Repository {
   /// {@macro data_shaft.repository}
   Repository() {
-    _repositoryObserver.onCreate(runtimeType.toString());
+    RepositoryObserverInstances.repositoryObserver.onCreate(
+      runtimeType.toString(),
+    );
   }
-
-  static final RepositoryObserver _repositoryObserver =
-      RepositoryObserverInstances.repositoryObserver;
 
   /// Frees up resources and notifies the observer.
   ///
   /// Must be called when the repository is no longer needed (e.g., when a BLoC/Provider closes).
   @mustCallSuper
   void dispose() {
-    _repositoryObserver.onDispose(runtimeType.toString());
+    RepositoryObserverInstances.repositoryObserver.onDispose(
+      runtimeType.toString(),
+    );
   }
 }

@@ -19,8 +19,10 @@ class _DefaultRepositoryImp implements RepositoryDataSourceCallableObserver {
     String datasourceName, {
     required DateTime startTime,
   }) {
-    log('🔛 Calling DataSource: $datasourceName',
-        name: _repoTag(repositoryName));
+    log(
+      '🔛 Calling DataSource: $datasourceName',
+      name: _repoTag(repositoryName),
+    );
   }
 
   @override
