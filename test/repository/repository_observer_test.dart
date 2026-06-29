@@ -174,8 +174,7 @@ void main() {
       );
     });
 
-    test(
-        'flag=true: explicit assignment still takes priority over fallback',
+    test('flag=true: explicit assignment still takes priority over fallback',
         () {
       final explicitObs = TestSafeObserver();
       final safeObs = TestSafeObserver();

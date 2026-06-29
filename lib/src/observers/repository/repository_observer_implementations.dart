@@ -19,7 +19,8 @@ class _DefaultRepositoryImp implements RepositoryDataSourceCallableObserver {
     String datasourceName, {
     required DateTime startTime,
   }) {
-    log('🔛 Calling DataSource: $datasourceName', name: _repoTag(repositoryName));
+    log('🔛 Calling DataSource: $datasourceName',
+        name: _repoTag(repositoryName));
   }
 
   @override
@@ -55,8 +56,10 @@ class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
     String datasourceName, {
     required DateTime startTime,
   }) {
-    log('🔛 Starting Safe Call -> $datasourceName',
-        name: _repoTag(repositoryName),);
+    log(
+      '🔛 Starting Safe Call -> $datasourceName',
+      name: _repoTag(repositoryName),
+    );
   }
 
   @override
@@ -132,7 +135,9 @@ class _DefaultRepositoryDataSourceStreamableObserverImpl
 
   @override
   void start(String repositoryName, String datasourceName) {
-    log('📡 Starting Stream -> $datasourceName',
-        name: _repoTag(repositoryName),);
+    log(
+      '📡 Starting Stream -> $datasourceName',
+      name: _repoTag(repositoryName),
+    );
   }
 }

@@ -79,8 +79,7 @@ void main() {
       expect(identical(resolved, explicitObs), true);
     });
 
-    test(
-        'flag=true with no observers set returns default without throwing',
+    test('flag=true with no observers set returns default without throwing',
         () {
       DatasourceObserverInstances.useHigherObserver = true;
 
