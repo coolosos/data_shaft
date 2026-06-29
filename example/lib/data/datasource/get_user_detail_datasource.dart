@@ -32,7 +32,7 @@ final class GetUserDetailDatasource
   }
 
   @override
-  Future<RemoteUser> call({required Params params}) {
+  Future<RemoteUser> call({required covariant Params params}) {
     count++;
     if (throwException case final exception?) {
       throw exception;
@@ -41,7 +41,8 @@ final class GetUserDetailDatasource
   }
 
   @override
-  RemoteUser transformation({required RequestResponse remoteResponse}) {
+  RemoteUser transformation(
+      {required covariant RequestResponse remoteResponse}) {
     return RemoteUser.fromJson(remoteResponse.body?.call() ?? '');
   }
 }

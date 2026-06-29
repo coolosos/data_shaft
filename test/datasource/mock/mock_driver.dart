@@ -33,15 +33,15 @@ class MockModel extends Codable<String, MockModel> {
   Encoding? get encoding => throw UnimplementedError();
 }
 
-class MockRemoteDriver implements RemoteDriver {
-  RequestResponse? simulatedResponse;
+class MockRemoteDriver implements RemoteDriver<Object?> {
+  RequestResponse<Object?>? simulatedResponse;
   Error? throwable;
   Uri? lastUri;
   Object? lastBody;
   Map<String, String>? lastHeaders;
 
   @override
-  Future<RequestResponse> get(
+  Future<RequestResponse<Object?>> get(
     Uri uri, {
     Map<String, String>? headers,
     Object? options,
@@ -55,7 +55,7 @@ class MockRemoteDriver implements RemoteDriver {
   }
 
   @override
-  Future<RequestResponse> post(
+  Future<RequestResponse<Object?>> post(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -72,7 +72,7 @@ class MockRemoteDriver implements RemoteDriver {
   }
 
   @override
-  Future<RequestResponse> delete(
+  Future<RequestResponse<Object?>> delete(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -81,7 +81,7 @@ class MockRemoteDriver implements RemoteDriver {
   }) async =>
       post(uri, body: body, headers: headers);
   @override
-  Future<RequestResponse> patch(
+  Future<RequestResponse<Object?>> patch(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -90,7 +90,7 @@ class MockRemoteDriver implements RemoteDriver {
   }) async =>
       post(uri, body: body, headers: headers);
   @override
-  Future<RequestResponse> put(
+  Future<RequestResponse<Object?>> put(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -100,7 +100,7 @@ class MockRemoteDriver implements RemoteDriver {
       post(uri, body: body, headers: headers);
 
   @override
-  Future<RequestResponse> head(
+  Future<RequestResponse<Object?>> head(
     Uri url, {
     Map<String, String>? headers,
     Object? options,

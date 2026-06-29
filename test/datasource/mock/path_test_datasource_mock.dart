@@ -22,7 +22,8 @@ final class PathTestDataSource
   @override
   Set<int> get admissibleStatusCode => {200};
   @override
-  MockModel transformation({required RequestResponse remoteResponse}) =>
+  MockModel transformation(
+          {required covariant RequestResponse remoteResponse}) =>
       const MockModel(name: '');
   @override
   GetParams generateCallRequirement({required Params params}) =>

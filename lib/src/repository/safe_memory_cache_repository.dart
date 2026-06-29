@@ -30,7 +30,7 @@ abstract class SafeMemoryCacheRepository<Info,
 
   @override
   Future<Either<RepositoryError, Info>> call({
-    required Params repositoryParams,
+    required covariant Params repositoryParams,
   }) async {
     // 1. Try Cache
     if (!isRefreshRequired()) {

@@ -209,6 +209,7 @@ final class _BodyTestDataSource
       PostParams(encodeBody: () => '{"key": "value"}');
 
   @override
-  MockModel transformation({required RequestResponse remoteResponse}) =>
+  MockModel transformation(
+          {required covariant RequestResponse remoteResponse}) =>
       const MockModel(name: 'test');
 }

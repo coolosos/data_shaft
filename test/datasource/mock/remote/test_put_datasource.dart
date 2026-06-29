@@ -35,7 +35,8 @@ final class TestPutDataSource
   }
 
   @override
-  MockModel transformation({required RequestResponse remoteResponse}) {
+  MockModel transformation(
+      {required covariant RequestResponse remoteResponse}) {
     return MockModel.fromJson(remoteResponse.body!());
   }
 }

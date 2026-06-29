@@ -46,7 +46,7 @@ abstract class DatasourceRemote<
 
   ///path of the provide information
   String? get path;
-  String? get pathPrefix => '';
+  String? get pathPrefix => null;
 
   ///path of the provide information
   Map<String, String> get pathModification => {};

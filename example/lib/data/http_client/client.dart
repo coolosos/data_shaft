@@ -1,12 +1,12 @@
 import 'package:data_shaft/data_shaft.dart';
 
-base class HttpDriver implements RemoteDriver {
+base class HttpDriver implements RemoteDriver<Object?> {
   HttpDriver({required this.simulatedResponse});
 
-  final RequestResponse simulatedResponse;
+  final RequestResponse<Object?> simulatedResponse;
 
   @override
-  Future<RequestResponse> get(
+  Future<RequestResponse<Object?>> get(
     Uri uri, {
     Map<String, String>? headers,
     Object? options,
@@ -14,7 +14,7 @@ base class HttpDriver implements RemoteDriver {
       simulatedResponse;
 
   @override
-  Future<RequestResponse> post(
+  Future<RequestResponse<Object?>> post(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -24,7 +24,7 @@ base class HttpDriver implements RemoteDriver {
       simulatedResponse;
 
   @override
-  Future<RequestResponse> delete(
+  Future<RequestResponse<Object?>> delete(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -33,7 +33,7 @@ base class HttpDriver implements RemoteDriver {
   }) async =>
       simulatedResponse;
   @override
-  Future<RequestResponse> patch(
+  Future<RequestResponse<Object?>> patch(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -42,7 +42,7 @@ base class HttpDriver implements RemoteDriver {
   }) async =>
       simulatedResponse;
   @override
-  Future<RequestResponse> put(
+  Future<RequestResponse<Object?>> put(
     Uri uri, {
     Map<String, String>? headers,
     Object? body,
@@ -52,7 +52,7 @@ base class HttpDriver implements RemoteDriver {
       simulatedResponse;
 
   @override
-  Future<RequestResponse> head(
+  Future<RequestResponse<Object?>> head(
     Uri url, {
     Map<String, String>? headers,
     Object? options,
