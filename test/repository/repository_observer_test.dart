@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'package:data_shaft/src/datasources/datasource_streamable.dart';
 import 'package:data_shaft/src/observers/repository/repository_observer_instances.dart';
+import 'package:data_shaft/src/repository/repository_datasource_callable.dart';
+import 'package:data_shaft/src/repository/repository_datasource_streamable.dart';
 import 'package:test/test.dart';
 
 import '../datasource/mock/user_remote_datasource_mock.dart';
@@ -8,13 +13,14 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
   bool onCreateCalled = false;
   bool beforeCallCalled = false;
   bool exceptionCalled = false;
+  bool onDisposeCalled = false;
   String? lastRepositoryName;
 
   @override
   void onCreate(String repositoryName) => onCreateCalled = true;
 
   @override
-  void onDispose(String repositoryName) {}
+  void onDispose(String repositoryName) => onDisposeCalled = true;
 
   @override
   void beforeCall(
@@ -109,6 +115,11 @@ void main() {
 
       expect(observer.exceptionCalled, true);
     });
+
+    test('Should notify onDispose when repository is disposed', () {
+      repository.dispose();
+      expect(observer.onDisposeCalled, true);
+    });
   });
 
   group('useHigherObserver', () {
@@ -202,4 +213,76 @@ void main() {
       );
     });
   });
+
+  group('default observer implementations', () {
+    test(
+        '_DefaultRepositoryImp should handle onDispose, beforeCall and afterCall',
+        () async {
+      final dataSource = UserDataSourceMock();
+      final repo = _DirectCallableRepo(dataSource: dataSource);
+
+      final result = await repo.call(
+        repositoryParams: const UserParams(id: '1'),
+      );
+
+      expect(result.isRight(), true);
+      repo.dispose();
+    });
+
+    test('_DefaultSafeRepository should handle onCreate and onDispose',
+        () async {
+      final repo = UserRepositoryMock(
+        dataSource: UserDataSourceMock(),
+        refreshDuration: const Duration(seconds: 1),
+      );
+
+      // ignore: cascade_invocations
+      repo.dispose();
+    });
+
+    test(
+        '_DefaultRepositoryDataSourceStreamableObserverImpl should handle lifecycle',
+        () async {
+      final dataSource = _StreamableDataSourceMock();
+      final repo = _StreamableRepoMock(dataSource: dataSource);
+
+      final stream = repo.stream(params: const UserParams(id: '1'));
+      expect(stream, isA<Stream<String>>());
+
+      repo.dispose();
+    });
+
+    test(
+        '_DefaultSafeRepository.onCreate and onDispose are callable through '
+        'the public getter', () {
+      RepositoryObserverInstances.safeCallableObserver
+        ..onCreate('test_repo')
+        ..onDispose('test_repo');
+    });
+
+    test(
+        '_DefaultRepositoryDataSourceStreamableObserverImpl.onCreate and '
+        'onDispose are callable through the public getter', () {
+      RepositoryObserverInstances.repositoryDataSourceStreamableObserver
+        ..onCreate('test_repo')
+        ..onDispose('test_repo');
+    });
+  });
+}
+
+class _DirectCallableRepo
+    extends RepositoryDataSourceCallable<User, UserDataSourceMock> {
+  _DirectCallableRepo({required super.dataSource});
+}
+
+class _StreamableDataSourceMock extends DataSourceStreamable<String> {
+  @override
+  Stream<String> stream({required covariant Params params}) {
+    return Stream.value('data');
+  }
+}
+
+class _StreamableRepoMock
+    extends RepositoryDataSourceStreamable<String, _StreamableDataSourceMock> {
+  _StreamableRepoMock({required super.dataSource});
 }
