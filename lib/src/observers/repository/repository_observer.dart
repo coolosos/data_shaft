@@ -7,10 +7,10 @@ abstract interface class RepositoryObserver implements SimpleObserver {
   const RepositoryObserver();
 
   @override
-  void onCreate(String name);
+  void onCreate(String repositoryName);
 
   @override
-  void onDispose(String name);
+  void onDispose(String repositoryName);
 }
 
 /// Observer for repositories that execute one-shot operations.
@@ -19,12 +19,26 @@ abstract interface class RepositoryDataSourceCallableObserver
   const RepositoryDataSourceCallableObserver();
 
   /// Called just before invoking the underlying DataSource.
-  @mustCallSuper
-  void beforeCall(String name, String callableName);
+  ///
+  /// [startTime] is the timestamp captured just before the call, useful
+  /// for computing elapsed time in conjunction with [afterCall].
+  void beforeCall(
+    String repositoryName,
+    String datasourceName, {
+    required DateTime startTime,
+  });
 
   /// Called after the DataSource finishes execution.
-  @mustCallSuper
-  void afterCall(String name, String datasourceName, Object? datasourceValue);
+  ///
+  /// [endTime] is the timestamp captured right after the call completes.
+  /// [elapsed] is the duration computed from [startTime] to [endTime].
+  void afterCall(
+    String repositoryName,
+    String datasourceName,
+    Object? datasourceValue, {
+    required DateTime endTime,
+    required Duration elapsed,
+  });
 }
 
 /// {@template data_shaft.safe_callable_repository_observer}
@@ -38,29 +52,26 @@ abstract interface class SafeCallableRepositoryObserver
   const SafeCallableRepositoryObserver();
 
   /// Logged when a known inadmissible business logic exception occurs.
-  @mustCallSuper
   void onInadmissibleException(
     Exception exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   });
 
   /// Logged when an uncontrolled server-side or infrastructure exception occurs.
-  @mustCallSuper
   void onUnControlException(
     Exception exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   });
 
   /// Logged when a generic or unknown exception (Object) is caught.
-  @mustCallSuper
   void onException(
     Object exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   });
 }
@@ -79,6 +90,5 @@ abstract interface class RepositoryDataSourceStreamableObserver
   ///
   /// Useful for tracking active subscriptions or debugging why a stream
   /// might be re-initialized multiple times.
-  @mustCallSuper
-  void start(String name, String callableName);
+  void start(String repositoryName, String datasourceName);
 }

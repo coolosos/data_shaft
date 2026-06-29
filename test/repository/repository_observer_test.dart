@@ -8,28 +8,38 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
   bool onCreateCalled = false;
   bool beforeCallCalled = false;
   bool exceptionCalled = false;
-  String? lastCallableName;
+  String? lastRepositoryName;
 
   @override
-  void onCreate(String name) => onCreateCalled = true;
+  void onCreate(String repositoryName) => onCreateCalled = true;
 
   @override
-  void onDispose(String name) {}
+  void onDispose(String repositoryName) {}
 
   @override
-  void beforeCall(String name, String callableName) {
+  void beforeCall(
+    String repositoryName,
+    String datasourceName, {
+    required DateTime startTime,
+  }) {
     beforeCallCalled = true;
-    lastCallableName = name;
+    lastRepositoryName = repositoryName;
   }
 
   @override
-  void afterCall(String name, String datasourceName, Object? datasourceValue) {}
+  void afterCall(
+    String repositoryName,
+    String datasourceName,
+    Object? datasourceValue, {
+    required DateTime endTime,
+    required Duration elapsed,
+  }) {}
 
   @override
   void onException(
     Object exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   }) {
     exceptionCalled = true;
@@ -39,7 +49,7 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
   void onInadmissibleException(
     Exception exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   }) {
     exceptionCalled = true;
@@ -49,7 +59,7 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
   void onUnControlException(
     Exception exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   }) {
     exceptionCalled = true;
@@ -57,24 +67,26 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
 }
 
 void main() {
-  late UserDataSourceMock dataSource;
-  late UserRepositoryMock repository;
-  late TestSafeObserver observer;
-
-  setUp(() {
-    observer = TestSafeObserver();
-
-    RepositoryObserverInstances.safeCallableObserver = observer;
-    RepositoryObserverInstances.repositoryObserver = observer;
-
-    dataSource = UserDataSourceMock();
-    repository = UserRepositoryMock(
-      dataSource: dataSource,
-      refreshDuration: const Duration(seconds: 1),
-    );
-  });
+  tearDown(RepositoryObserverInstances.reset);
 
   group('Repository Observer Integration Tests', () {
+    late UserDataSourceMock dataSource;
+    late UserRepositoryMock repository;
+    late TestSafeObserver observer;
+
+    setUp(() {
+      observer = TestSafeObserver();
+
+      RepositoryObserverInstances.safeCallableObserver = observer;
+      RepositoryObserverInstances.repositoryObserver = observer;
+
+      dataSource = UserDataSourceMock();
+      repository = UserRepositoryMock(
+        dataSource: dataSource,
+        refreshDuration: const Duration(seconds: 1),
+      );
+    });
+
     test('Should notify onCreate when repository is instantiated', () {
       expect(observer.onCreateCalled, true);
     });
@@ -83,7 +95,7 @@ void main() {
       await repository.call(repositoryParams: const UserParams(id: '1'));
 
       expect(observer.beforeCallCalled, true);
-      expect(observer.lastCallableName, contains('UserRepositoryMock'));
+      expect(observer.lastRepositoryName, contains('UserRepositoryMock'));
     });
 
     test('Should notify onException when an unexpected error occurs', () async {
@@ -96,6 +108,99 @@ void main() {
       ).call(repositoryParams: const UserParams(id: '1'));
 
       expect(observer.exceptionCalled, true);
+    });
+  });
+
+  group('useHigherObserver', () {
+    test(
+        'flag=false: repositoryObserver does NOT fallback to safeCallableObserver',
+        () {
+      final safeObs = TestSafeObserver();
+      RepositoryObserverInstances.safeCallableObserver = safeObs;
+
+      expect(
+        identical(
+          RepositoryObserverInstances.repositoryObserver,
+          safeObs,
+        ),
+        false,
+      );
+      expect(
+        identical(
+          RepositoryObserverInstances.repositoryDatasourceCallableObserver,
+          safeObs,
+        ),
+        false,
+      );
+    });
+
+    test(
+        'flag=true: repositoryObserver and repositoryDatasourceCallableObserver '
+        'fallback to safeCallableObserver', () {
+      final safeObs = TestSafeObserver();
+      RepositoryObserverInstances.safeCallableObserver = safeObs;
+      RepositoryObserverInstances.useHigherObserver = true;
+
+      expect(
+        identical(
+          RepositoryObserverInstances.repositoryObserver,
+          safeObs,
+        ),
+        true,
+      );
+      expect(
+        identical(
+          RepositoryObserverInstances.repositoryDatasourceCallableObserver,
+          safeObs,
+        ),
+        true,
+      );
+    });
+
+    test(
+        'flag=true: repositoryDatasourceCallableObserver is used as fallback '
+        'for repositoryObserver', () {
+      final callableObs = TestSafeObserver();
+      RepositoryObserverInstances.repositoryDatasourceCallableObserver =
+          callableObs;
+      RepositoryObserverInstances.useHigherObserver = true;
+
+      expect(
+        identical(
+          RepositoryObserverInstances.repositoryObserver,
+          callableObs,
+        ),
+        true,
+      );
+    });
+
+    test(
+        'flag=true: explicit assignment still takes priority over fallback',
+        () {
+      final explicitObs = TestSafeObserver();
+      final safeObs = TestSafeObserver();
+      RepositoryObserverInstances.repositoryObserver = explicitObs;
+      RepositoryObserverInstances.safeCallableObserver = safeObs;
+      RepositoryObserverInstances.useHigherObserver = true;
+
+      expect(
+        identical(
+          RepositoryObserverInstances.repositoryObserver,
+          explicitObs,
+        ),
+        true,
+      );
+    });
+
+    test('flag=true with no observers set returns default without throwing',
+        () {
+      RepositoryObserverInstances.useHigherObserver = true;
+
+      expect(RepositoryObserverInstances.repositoryObserver, isNotNull);
+      expect(
+        RepositoryObserverInstances.repositoryDatasourceCallableObserver,
+        isNotNull,
+      );
     });
   });
 }

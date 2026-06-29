@@ -21,10 +21,10 @@ final class TestGetDataSource
   Map<String, String> get pathModification => {':id': '123'};
 
   @override
-  List<int> get admissibleStatusCode => [200];
+  Set<int> get admissibleStatusCode => {200};
 
   @override
-  List<int> get inadmissibleStatusCode => [404];
+  Set<int> get inadmissibleStatusCode => {404};
 
   @override
   GetParams generateCallRequirement({required Params params}) {

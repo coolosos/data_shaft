@@ -4,25 +4,35 @@ String _repoTag(String name) => 'REPO.$name';
 
 class _DefaultRepositoryImp implements RepositoryDataSourceCallableObserver {
   @override
-  void onCreate(String name) {
-    log('⛅️ Created', name: _repoTag(name));
+  void onCreate(String repositoryName) {
+    log('⛅️ Created', name: _repoTag(repositoryName));
   }
 
   @override
-  void onDispose(String name) {
-    log('💨 Disposed', name: _repoTag(name));
+  void onDispose(String repositoryName) {
+    log('💨 Disposed', name: _repoTag(repositoryName));
   }
 
   @override
-  void beforeCall(String name, String datasourceName) {
-    log('🔛 Calling DataSource: $datasourceName', name: _repoTag(name));
+  void beforeCall(
+    String repositoryName,
+    String datasourceName, {
+    required DateTime startTime,
+  }) {
+    log('🔛 Calling DataSource: $datasourceName', name: _repoTag(repositoryName));
   }
 
   @override
-  void afterCall(String name, String datasourceName, Object? datasourceValue) {
+  void afterCall(
+    String repositoryName,
+    String datasourceName,
+    Object? datasourceValue, {
+    required DateTime endTime,
+    required Duration elapsed,
+  }) {
     log(
-      '✅ Finished $datasourceName | Result: $datasourceValue',
-      name: _repoTag(name),
+      '✅ Finished $datasourceName | Result: $datasourceValue | Elapsed: ${elapsed.inMilliseconds}ms',
+      name: _repoTag(repositoryName),
     );
   }
 }
@@ -30,25 +40,36 @@ class _DefaultRepositoryImp implements RepositoryDataSourceCallableObserver {
 @reopen
 class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
   @override
-  void onCreate(String name) {
-    log('⛅️ Created (Safe)', name: _repoTag(name));
+  void onCreate(String repositoryName) {
+    log('⛅️ Created (Safe)', name: _repoTag(repositoryName));
   }
 
   @override
-  void onDispose(String name) {
-    log('💨 Disposed (Safe)', name: _repoTag(name));
+  void onDispose(String repositoryName) {
+    log('💨 Disposed (Safe)', name: _repoTag(repositoryName));
   }
 
   @override
-  void beforeCall(String name, String callableName) {
-    log('🔛 Starting Safe Call -> $callableName', name: _repoTag(name));
+  void beforeCall(
+    String repositoryName,
+    String datasourceName, {
+    required DateTime startTime,
+  }) {
+    log('🔛 Starting Safe Call -> $datasourceName',
+        name: _repoTag(repositoryName),);
   }
 
   @override
-  void afterCall(String name, String datasourceName, Object? datasourceValue) {
+  void afterCall(
+    String repositoryName,
+    String datasourceName,
+    Object? datasourceValue, {
+    required DateTime endTime,
+    required Duration elapsed,
+  }) {
     log(
-      '✅ Safe Call Complete | Result: $datasourceValue',
-      name: _repoTag(name),
+      '✅ Safe Call Complete | Result: $datasourceValue | Elapsed: ${elapsed.inMilliseconds}ms',
+      name: _repoTag(repositoryName),
     );
   }
 
@@ -56,11 +77,11 @@ class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
   void onInadmissibleException(
     Exception exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   }) {
     log(
-      '⚠️ Inadmissible Exception in $callableName',
+      '⚠️ Inadmissible Exception in $repositoryName',
       name: _repoTag('SAFE_ERROR'),
       error: exception,
     );
@@ -70,11 +91,11 @@ class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
   void onUnControlException(
     Exception exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   }) {
     log(
-      '🚨 Uncontrolled Exception in $callableName',
+      '🚨 Uncontrolled Exception in $repositoryName',
       name: _repoTag('SAFE_ERROR'),
       error: exception,
       stackTrace: stackTrace,
@@ -85,11 +106,11 @@ class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
   void onException(
     Object exception,
     StackTrace stackTrace,
-    String callableName, {
+    String repositoryName, {
     Map<String, String>? customParameters,
   }) {
     log(
-      '❌ Unexpected Object Exception in $callableName',
+      '❌ Unexpected Object Exception in $repositoryName',
       name: _repoTag('SAFE_ERROR'),
       error: exception,
       stackTrace: stackTrace,
@@ -100,17 +121,18 @@ class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
 class _DefaultRepositoryDataSourceStreamableObserverImpl
     implements RepositoryDataSourceStreamableObserver {
   @override
-  void onCreate(String name) {
-    log('⛅️ Created (Streamable)', name: _repoTag(name));
+  void onCreate(String repositoryName) {
+    log('⛅️ Created (Streamable)', name: _repoTag(repositoryName));
   }
 
   @override
-  void onDispose(String name) {
-    log('💨 Disposed (Streamable)', name: _repoTag(name));
+  void onDispose(String repositoryName) {
+    log('💨 Disposed (Streamable)', name: _repoTag(repositoryName));
   }
 
   @override
-  void start(String name, String callableName) {
-    log('📡 Starting Stream -> $callableName', name: _repoTag(name));
+  void start(String repositoryName, String datasourceName) {
+    log('📡 Starting Stream -> $datasourceName',
+        name: _repoTag(repositoryName),);
   }
 }

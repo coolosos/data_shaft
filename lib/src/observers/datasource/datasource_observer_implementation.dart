@@ -43,8 +43,8 @@ final class _HttpDatasourceObserverImpl implements HttpDatasourceObserver {
     int statusCode,
     String body,
     Object? response,
-    List<int> inadmissibleList,
-    List<int> admissibleList, {
+    Set<int> inadmissibleStatusCodes,
+    Set<int> admissibleStatusCodes, {
     required String datasourceName,
     Map<String, String>? requestHeaders,
     Uri? requestUri,
@@ -54,7 +54,7 @@ final class _HttpDatasourceObserverImpl implements HttpDatasourceObserver {
       '🚨 UNCONTROLLED ERROR\n'
       'Status: $statusCode\n'
       'Uri: $requestUri\n'
-      'Allowed: $admissibleList\n'
+      'Allowed: $admissibleStatusCodes\n'
       'Response: $body',
       name: _tagName(datasourceName),
     );
@@ -65,7 +65,7 @@ final class _HttpDatasourceObserverImpl implements HttpDatasourceObserver {
     int statusCode,
     String body,
     Object? response,
-    List<int> inadmissibleList, {
+    Set<int> inadmissibleStatusCodes, {
     required String datasourceName,
     Map<String, String>? requestHeaders,
     Uri? requestUri,

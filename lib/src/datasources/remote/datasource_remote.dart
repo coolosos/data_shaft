@@ -51,15 +51,15 @@ abstract class DatasourceRemote<
   ///path of the provide information
   Map<String, String> get pathModification => {};
 
-  ///List of http status code with the admissible status codes.
-  List<int> get admissibleStatusCode;
+  ///Set of http status codes that are considered admissible.
+  Set<int> get admissibleStatusCode;
 
-  ///List of http status code with the inadmissible status codes.
+  ///Set of http status codes that are considered inadmissible.
   ///
-  ///When inadmissible statusCode is return in call a [InadmissibleDataSourceException] with the current information.
+  ///When an inadmissible statusCode is returned, an [InadmissibleDataSourceException] is thrown.
   ///
-  ///Usually this must be uses for datasource error status code control.
-  List<int> get inadmissibleStatusCode => [];
+  ///Usually used for business-rule error status codes (e.g. 404).
+  Set<int> get inadmissibleStatusCode => {};
 
   @override
   HttpDatasourceObserver get observer =>
@@ -150,7 +150,7 @@ abstract class DatasourceRemote<
         requestResponse.statusCode,
         requestResponse.body?.call() ?? '',
         requestResponse.originalResponse,
-        List.from(inadmissibleStatusCode),
+        Set.unmodifiable(inadmissibleStatusCode),
         datasourceName: runtimeType.toString(),
         requestBody: requestBody,
         requestHeaders: requestHeaders,
@@ -170,8 +170,8 @@ abstract class DatasourceRemote<
         requestResponse.statusCode,
         requestResponse.body?.call() ?? '',
         requestResponse.originalResponse,
-        List.from(inadmissibleStatusCode),
-        List.from(admissibleStatusCode),
+        Set.unmodifiable(inadmissibleStatusCode),
+        Set.unmodifiable(admissibleStatusCode),
         datasourceName: runtimeType.toString(),
         requestBody: requestBody,
         requestHeaders: requestHeaders,

@@ -168,15 +168,23 @@ Prevent redundant requests. If two identical calls are triggered simultaneously,
 ```dart
 // Example console output:
 // [DS.REMOTE.GetUserDataSource] 🔛 CALLING: [https://api.com/user/1](https://api.com/user/1)
-// [REPO.GetUserRepository] ✅ Safe Call Complete | Result: Instance of 'User'
+// [REPO.GetUserRepository] ✅ Safe Call Complete | Result: Instance of 'User' | Elapsed: 42ms
 ```
 
 Customize logging by implementing `HttpDatasourceObserver` or `RepositoryObserver`:
 
-
 ```dart
 DatasourceObserverInstances.httpDatasourceObserver = MyCustomLogStrategy();
 ```
+
+If you only implement a higher-level observer (e.g. `HttpDatasourceObserver`) and want it to also receive basic lifecycle events (`onCreate`, `onDispose`), enable the fallback:
+
+```dart
+DatasourceObserverInstances.httpDatasourceObserver = MyCustomLogStrategy();
+DatasourceObserverInstances.useHigherObserver = true;
+```
+
+The same applies to repositories: `RepositoryObserverInstances.useHigherObserver = true` makes your `safeCallableObserver` serve as fallback for `repositoryObserver` and `repositoryDatasourceCallableObserver`.
 
 ## 📚 API Reference
 
