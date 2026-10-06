@@ -1,11 +1,9 @@
-import 'package:data_shaft/data_shaft.dart' show DatasourceRemote, RemoteDriver;
-
 /// {@template data_shaft.request_response}
-/// A standardized response object returned by [RemoteDriver].
+/// A standardized response object returned by the driver layer.
 ///
 /// This class acts as an **Adapter**, encapsulating the response data from any
 /// underlying HTTP client (such as Dio, http, or Chopper) into a format
-/// that [DatasourceRemote] can process consistently.
+/// that the datasource layer can process consistently.
 /// {@endtemplate}
 class RequestResponse<OriginalResponse> {
   /// {@macro data_shaft.request_response}
@@ -25,7 +23,7 @@ class RequestResponse<OriginalResponse> {
   /// The raw body of the response.
   ///
   /// Usually contains a [String] (JSON/XML) or a decoded [Map]/[List]
-  /// depending on how the [RemoteDriver] is configured.
+  /// depending on how the driver is configured.
   final String Function()? body;
 
   /// The HTTP response headers returned by the server.

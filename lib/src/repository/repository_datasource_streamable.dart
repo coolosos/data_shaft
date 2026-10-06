@@ -1,9 +1,6 @@
 import 'dart:async';
 
-import 'package:data_shaft/data_shaft.dart' show Repository;
-import 'package:data_shaft/repository.dart' show Repository;
 import 'package:data_shaft/src/repository/base_repository.dart' show Repository;
-import 'package:data_shaft/src/repository/repository.dart' show Repository;
 import 'package:meta/meta.dart';
 
 import '../datasources/datasource_streamable.dart';
