@@ -1,3 +1,20 @@
+## 3.0.0
+### ⚠️ BREAKING CHANGES
+- **Minimum SDK raised to Dart 3.13**: `environment.sdk` is now `">=3.13.0 <4.0.0"`.
+- **`cool_bedrock` bumped to `^3.0.0`**: the new major version of the underlying dependency.
+### Added
+- **HEAD request support**: `HeadParams`, `HeadCall` mixin and `DatasourceHeadRemote` for remote HEAD operations.
+- **`RepositoryCallErrorObserver`**: new `callErrorObserver` slot in `RepositoryObserverInstances` to observe datasource call errors together with timing info (`endTime`, `elapsed`).
+- **Error context**: `UnControlRepositoryError` now exposes `cause` and `stackTrace`; `InadmissibleRepositoryError` exposes `statusCode` and `body`. Default mappers propagate this context automatically.
+### Fixed
+- **Cache only successes**: `SafeMemoryCacheRepository` no longer caches failure results; the last valid cache is kept when a later call fails.
+- **No deadlock on deduplication**: the dedup key is now always released when the underlying datasource call throws.
+- **Driver options forwarding**: `encoding` and `driverOptions` are now forwarded to the driver in all HTTP methods (GET, HEAD, POST, PUT, PATCH, DELETE).
+- **Lazy error body**: the `body()` callback is only evaluated on error branches in `checkInformation`.
+- **`pathModification`**: now replaces every occurrence of the token instead of only the first one.
+### Chore
+- Aligned with Dart 3.13 lints (coolint 3.0.0), removed redundant self imports, and improved README and API documentation.
+
 ## 2.0.0
 ### ⚠️ BREAKING CHANGES
 - **`List<int>` → `Set<int>` for status codes**: `inadmissibleStatusCode` and `admissibleStatusCode` in `DatasourceRemote` and observer interfaces now return `Set<int>` instead of `List<int>`.
