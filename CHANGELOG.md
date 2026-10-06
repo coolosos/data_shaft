@@ -7,7 +7,7 @@
 - **`RepositoryCallErrorObserver`**: new `callErrorObserver` slot in `RepositoryObserverInstances` to observe datasource call errors together with timing info (`endTime`, `elapsed`).
 - **Error context**: `UnControlRepositoryError` now exposes `cause` and `stackTrace`; `InadmissibleRepositoryError` exposes `statusCode` and `body`. Default mappers propagate this context automatically.
 ### Fixed
-- **Cache only successes**: `SafeMemoryCacheRepository` no longer caches failure results; the last valid cache is kept when a later call fails.
+- **Caching semantics clarified**: `refreshCache` is now invoked on every outcome (success and failure) and acts as the extension point for custom caching policies. By default a failed call returns `null`, which **clears** the cache, so the next call always re-queries the datasource. Override it (e.g. `datasourceResponse.toNullable() ?? cache`) to keep the last valid value on failure.
 - **No deadlock on deduplication**: the dedup key is now always released when the underlying datasource call throws.
 - **Driver options forwarding**: `encoding` and `driverOptions` are now forwarded to the driver in all HTTP methods (GET, HEAD, POST, PUT, PATCH, DELETE).
 - **Lazy error body**: the `body()` callback is only evaluated on error branches in `checkInformation`.

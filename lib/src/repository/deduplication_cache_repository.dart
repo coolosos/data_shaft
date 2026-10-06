@@ -17,7 +17,8 @@ import 'safe_memory_cache_repository.dart';
 /// 2. **Cache Check**: If valid data exists in memory ([isRefreshRequired] is false), it returns immediately.
 /// 3. **Execution**: If it's a new unique request, it calls the [DataSource].
 /// 4. **Safety**: Any exception during the process is caught and mapped to a [RepositoryError].
-/// 5. **Update**: Successful results are stored in the cache for future calls.
+/// 5. **Update**: The [refreshCache] hook runs with the outcome (a `null`
+///    result clears the cache by default).
 ///
 /// **Generic Types:**
 /// * [Info]: The data model type.

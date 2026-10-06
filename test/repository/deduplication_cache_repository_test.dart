@@ -1,3 +1,4 @@
+import 'package:cool_bedrock/cool_bedrock.dart';
 import 'package:data_shaft/src/issues/datasource_exception/inadmissible_data_source_exception.dart';
 import 'package:data_shaft/src/issues/datasource_exception/un_control_data_source_exception.dart';
 import 'package:data_shaft/src/issues/repository_error/inadmissible_repository_error.dart';
@@ -175,7 +176,7 @@ void main() {
       expect(repositoryThrow.isCached(), true);
     });
 
-    test('Should keep the last valid cache when a later call fails', () async {
+    test('A failed call clears the cache (null = clear)', () async {
       dataSourceThrowMock.errorToThrow = null;
       const params = UserParams(id: '1');
 
@@ -192,22 +193,43 @@ void main() {
       expect(dataSourceThrowMock.callCount, 2);
       expect(
         repositoryThrow.isCached(),
-        true,
-        reason: 'a failed call must not discard the last valid cache',
+        false,
+        reason: 'a null refreshCache result clears the last cached value',
       );
-      expect(
-        repositoryThrow.cache?.name,
-        'User 1',
-        reason: 'the last valid value survives a failed refresh',
-      );
-
-      dataSourceThrowMock.errorToThrow = null;
-      final served = await repositoryThrow.call(repositoryParams: params);
-
-      expect(served.isRight(), true);
-      expect(repositoryThrow.isCached(), true);
-      expect(repositoryThrow.cache?.name, 'User 1');
+      expect(repositoryThrow.cache, isNull);
     });
+
+    test(
+      'refreshCache override can keep the last valid cache on failure',
+      () async {
+        final keepRepository = KeepLastCacheRepository(
+          dataSource: dataSourceThrowMock,
+          refreshDuration: const Duration(seconds: 2),
+        );
+        dataSourceThrowMock.errorToThrow = null;
+        const params = UserParams(id: '1');
+
+        await keepRepository.call(repositoryParams: params);
+        expect(dataSourceThrowMock.callCount, 1);
+        expect(keepRepository.isCached(), true);
+
+        await Future<void>.delayed(
+          const Duration(seconds: 2, milliseconds: 100),
+        );
+
+        dataSourceThrowMock.errorToThrow = Exception('Network down');
+        final failedCall = await keepRepository.call(repositoryParams: params);
+
+        expect(failedCall.isLeft(), true);
+        expect(dataSourceThrowMock.callCount, 2);
+        expect(
+          keepRepository.isCached(),
+          true,
+          reason: 'the override keeps the last valid value on failure',
+        );
+        expect(keepRepository.cache?.name, 'User 1');
+      },
+    );
 
     test(
       'Dedup key is released when the datasource call throws (no deadlock)',
@@ -270,4 +292,18 @@ class _ThrowingDedupRepository
     extends RepositoryDataSourceCallable<User, UserDataSourceThrowMock>
     with DeduplicationManagement<User, UserDataSourceThrowMock> {
   new({required super.dataSource});
+}
+
+/// Demonstrates the `refreshCache` extension point: on a failed call it
+/// returns the previous cache value instead of `null`, so the last good data
+/// survives a failed refresh.
+class KeepLastCacheRepository extends UserRepositoryThrowMock {
+  new({required super.dataSource, required super.refreshDuration});
+
+  @override
+  User? refreshCache({
+    required Either<RepositoryError, User> datasourceResponse,
+  }) {
+    return datasourceResponse.toNullable() ?? cache;
+  }
 }

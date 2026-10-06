@@ -28,6 +28,8 @@ mixin MemoryCacheHelper<Info> {
   }
 
   /// Updates the cached data and sets the [timeStamp] to now.
+  ///
+  /// Assigning `null` **clears** the cache entry without updating [timeStamp].
   set cache(Info? cache) {
     if (cache != null) {
       timeStamp = DateTime.now();

@@ -170,8 +170,10 @@ The framework manages three error levels to ensure your UI never receives an unh
 
 ### ⏱ Smart Caching
 Use `SafeMemoryCacheRepository` to get an out-of-the-box memory cache with a configurable `refreshDuration`.
-A failed refresh never discards the last valid cached value: your users keep seeing the last good data
-even while the network is down.
+A failed refresh clears the cache by default (`refreshCache` returns `null`, which means "clear"),
+so the next call always re-queries the datasource. Need a different policy? Override `refreshCache` —
+it is invoked after every call and gives you full control, e.g.
+`return datasourceResponse.toNullable() ?? cache;` keeps the last good value on failure.
 
 ### 👯 Deduplication
 Prevent redundant requests. If two identical calls are triggered simultaneously, `DeduplicationManagement`
