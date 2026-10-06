@@ -24,7 +24,7 @@ import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 /// {@endtemplate}
 abstract base class DatasourcePostRemote<
   RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
+  Driver extends RemoteDriver<Object?>
 >
     extends DatasourceRemote<RemoteObject, Driver>
     with PostCall<RemoteObject, Driver> {

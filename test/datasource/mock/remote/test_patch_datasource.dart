@@ -4,7 +4,7 @@ import '../mock_driver.dart';
 
 final class TestPatchDataSource
     extends DatasourcePatchRemote<MockModel, MockRemoteDriver> {
-  TestPatchDataSource({required super.driver});
+  new({required super.driver});
 
   int callCount = 0;
 
@@ -36,7 +36,7 @@ final class TestPatchDataSource
 
   @override
   MockModel transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   }) {
     return MockModel.fromJson(remoteResponse.body!());
   }

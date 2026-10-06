@@ -34,16 +34,16 @@ The `RemoteDriver` acts as an adapter. Here is how you bridge **Dio** with **Dat
 import 'package:dio/dio.dart';
 import 'package:data_shaft/data_shaft.dart';
 
-class DioRemoteDriver implements RemoteDriver {
+class DioRemoteDriver implements RemoteDriver<Response> {
   final Dio dio;
-  DioRemoteDriver(this.dio);
+  new(this.dio);
 
   @override
-  Future<RequestResponse> get(Uri uri, {Map<String, String>? headers, Object? options}) async {
+  Future<RequestResponse<Response>> get(Uri uri, {Map<String, String>? headers, Object? options}) async {
     final response = await dio.getUri(uri, options: options as Options);
     return RequestResponse(
       statusCode: response.statusCode ?? 500,
-      body: response.data.toString(),
+      body: () => response.data.toString(),
       headers: response.headers.map.map((k, v) => MapEntry(k, v.join(','))),
       originalResponse: response,
     );
@@ -57,7 +57,7 @@ class DioRemoteDriver implements RemoteDriver {
 DataSources are specialized for specific operations. Use the pre-built base classes to save time:
 ```dart
 class GetUserDataSource extends DatasourceGetRemote<User, MyDriver> {
-  GetUserDataSource({required super.driver});
+  new({required super.driver});
 
   @override
   GetParams? generateCallRequirement({required Params params}) {
@@ -71,7 +71,7 @@ You can use mixins directly on a `DatasourceRemote` to define request behavior w
 ```dart
 class UpdateUserDataSource extends DatasourceRemote<User, DioRemoteDriver> 
     with PatchCall<User, DioRemoteDriver> {
-  UpdateUserDataSource({required super.driver});
+  new({required super.driver});
 
   @override
   PatchParams generateCallRequirement({required Params params}) {
@@ -87,7 +87,7 @@ The `SafeRepositoryDatasourceCallable` catches all exceptions and converts them 
 ```dart
 // The Repository handles safety, mapping, and deduplication
 final class GetUserDetailRepository extends DeduplicationRepository<User, GetUserDataSource> {
-  GetUserDetailRepository({required super.dataSource});
+  new({required super.dataSource});
   
   // Calling this repository returns: Future<Either<RepositoryError, User>>
 }
@@ -107,7 +107,7 @@ You can use mixins directly on a `Repository` to define datasource reply without
 class GetUserDetailRepository extends RepositoryDataSourceCallable<User, GetUserDataSource>
     with DeduplicationManagement<User, GetUserDataSource>, SafeRepositoryHelper<User> {
   
-  GetUserDetailRepository({required super.dataSource});
+  new({required super.dataSource});
 
   @override
   Future<Either<RepositoryError, User>> call({

@@ -38,7 +38,7 @@ void main() {
     expect(datasourceObserver.isOnCreateCall, 0);
     expect(remoteDatasourceObserver.isOnDriverException, 0);
     driver.throwable = UnimplementedError();
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     await repository.call(repositoryParams: const NoParams());
     expect(remoteDatasourceObserver.isOnCreateCall, 1);
     expect(remoteDatasourceObserver.isOnUriCreation, 2);

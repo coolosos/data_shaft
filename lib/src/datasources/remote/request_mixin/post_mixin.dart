@@ -6,7 +6,7 @@ part of 'request_mixin.dart';
 /// It handles the serialization of the body via [PostParams.encodeBody].
 mixin PostCall<
   RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
+  Driver extends RemoteDriver<Object?>
 >
     on DatasourceRemote<RemoteObject, Driver> {
   /// Generates the specific parameters required for a POST request.

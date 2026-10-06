@@ -1,10 +1,1 @@
 include: package:coolint/dart.yaml
-analyzer:
-  exclude:
-    - ".github/**"
-    - ".local_bricks/**"
-    - "**/.local_bricks/**"
-    - "**/widgetbook/**"
-    - "**/example/**"
-  enable-experiment:
-    - primary-constructors

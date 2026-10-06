@@ -6,7 +6,7 @@ part of 'request_mixin.dart';
 /// follows the PATCH semantics.
 mixin PatchCall<
   RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
+  Driver extends RemoteDriver<Object?>
 >
     on DatasourceRemote<RemoteObject, Driver> {
   /// Generates the specific parameters required for a PATCH request.

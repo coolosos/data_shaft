@@ -5,7 +5,7 @@ part of 'request_mixin.dart';
 /// Use this mixin when the datasource is intended to replace an existing resource completely.
 mixin PutCall<
   RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
+  Driver extends RemoteDriver<Object?>
 >
     on DatasourceRemote<RemoteObject, Driver> {
   /// Generates the specific parameters required for a PUT request.

@@ -219,6 +219,6 @@ final class _BodyTestDataSource
 
   @override
   MockModel transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   }) => const MockModel(name: 'test');
 }

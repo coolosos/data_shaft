@@ -36,7 +36,7 @@ final class TestDeleteDataSource
 
   @override
   MockModel transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   }) {
     return MockModel.fromJson(remoteResponse.body!.call());
   }

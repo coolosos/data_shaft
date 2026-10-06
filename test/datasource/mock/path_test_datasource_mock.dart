@@ -4,7 +4,7 @@ import 'mock_driver.dart';
 
 final class PathTestDataSource
     extends DatasourceGetRemote<MockModel, MockRemoteDriver> {
-  PathTestDataSource({
+  new({
     required super.driver,
     required this.customPath,
     required this.customPrefix,
@@ -23,7 +23,7 @@ final class PathTestDataSource
   Set<int> get admissibleStatusCode => {200};
   @override
   MockModel transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   }) => const MockModel(name: '');
   @override
   GetParams generateCallRequirement({required Params params}) =>

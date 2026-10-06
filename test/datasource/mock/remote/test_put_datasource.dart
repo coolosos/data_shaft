@@ -4,7 +4,7 @@ import '../mock_driver.dart';
 
 final class TestPutDataSource
     extends DatasourcePutRemote<MockModel, MockRemoteDriver> {
-  TestPutDataSource({required super.driver});
+  new({required super.driver});
 
   int callCount = 0;
 
@@ -36,7 +36,7 @@ final class TestPutDataSource
 
   @override
   MockModel transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   }) {
     return MockModel.fromJson(remoteResponse.body!());
   }

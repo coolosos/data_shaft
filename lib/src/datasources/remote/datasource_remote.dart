@@ -34,7 +34,7 @@ export 'request_response/request_response.dart';
 /// {@endtemplate}
 abstract class DatasourceRemote<
   RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
+  Driver extends RemoteDriver<Object?>
 >
     extends DataSourceCallable<RemoteObject> {
   /// {@macro data_shaft.datasource_remote}
@@ -134,7 +134,7 @@ abstract class DatasourceRemote<
   ///Transform the information of response.body in [RemoteObject] object.
   ///This function is required because factory of T is not possible.
   FutureOr<RemoteObject> transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   });
 
   ///Usually use after server call to return the required data or failure.
@@ -142,7 +142,7 @@ abstract class DatasourceRemote<
   ///By default, [transformation] function will be call after success response.
   @mustCallSuper
   FutureOr<RemoteObject> checkInformation({
-    required covariant RequestResponse requestResponse,
+    required covariant RequestResponse<Object?> requestResponse,
     required Map<String, String>? requestHeaders,
     required Uri? requestUri,
     Object? requestBody,
@@ -213,7 +213,7 @@ abstract class DatasourceRemote<
       datasourceName: runtimeType.toString(),
     );
 
-    final RequestResponse response;
+    final RequestResponse<Object?> response;
     try {
       response = await switch (requestParams) {
         DeleteParams() => driver.delete(
@@ -249,7 +249,7 @@ abstract class DatasourceRemote<
       );
       rethrow;
     }
-    return checkInformation(
+    return await checkInformation(
       requestResponse: response,
       requestHeaders: requestParams.headers,
       requestUri: callUri,

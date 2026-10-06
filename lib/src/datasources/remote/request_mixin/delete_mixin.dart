@@ -8,7 +8,7 @@ part of 'request_mixin.dart';
 /// supports passing a body via [DeleteParams] if the server API requires it.
 mixin DeleteCall<
   RemoteObject extends Codable<Object, RemoteObject>,
-  Driver extends RemoteDriver
+  Driver extends RemoteDriver<Object?>
 >
     on DatasourceRemote<RemoteObject, Driver> {
   /// Generates the specific parameters required for a DELETE request.
