@@ -1,13 +1,1 @@
-include: package:coolint/coolint.yaml
-analyzer:
-  errors:
-    document_ignores: ignore
-  exclude:
-    - "/**/.github/**"
-
-  plugins:
-    - custom_lint
-linter:
-  rules:
-    depend_on_referenced_packages: false
-    avoid_positional_boolean_parameters: false
+include: package:coolint/dart.yaml

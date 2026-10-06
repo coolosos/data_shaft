@@ -31,15 +31,17 @@ void main() {
       expect(await dataSource.read, null);
     });
 
-    test('Should return value when calling the instance (call method)',
-        () async {
-      const token = 'secret-key';
-      await dataSource.put(token);
+    test(
+      'Should return value when calling the instance (call method)',
+      () async {
+        const token = 'secret-key';
+        await dataSource.put(token);
 
-      final result = await dataSource();
+        final result = await dataSource();
 
-      expect(result, token);
-    });
+        expect(result, token);
+      },
+    );
 
     test('Should remove value when delete is called directly', () async {
       driver.storage[dataSource.key] = 'to-be-deleted';

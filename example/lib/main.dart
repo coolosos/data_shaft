@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print Example main
 
 import 'package:data_shaft/data_shaft.dart';
 import 'package:data_shaft_example/data/datasource/get_user_detail_datasource.dart';
@@ -15,15 +15,18 @@ Future<void> main(List<String> args) async {
     ),
   );
 
-  final successfulDatasource =
-      GetUserDetailDatasource(driver: successfulDriver);
-  final successfulRepository =
-      GetUserDetailRepository(dataSource: successfulDatasource);
+  final successfulDatasource = GetUserDetailDatasource(
+    driver: successfulDriver,
+  );
+  final successfulRepository = GetUserDetailRepository(
+    dataSource: successfulDatasource,
+  );
 
   print('\n--- Successful request set ---');
 
-  final successfulResult =
-      await successfulRepository.call(repositoryParams: noParams);
+  final successfulResult = await successfulRepository.call(
+    repositoryParams: noParams,
+  );
 
   print('Result: $successfulResult');
   // Output: Right(User(name: Dart User))
@@ -46,8 +49,10 @@ Future<void> main(List<String> args) async {
   print('\n--- Throw/Error request set ---');
 
   final throwDriver = HttpDriver(
-    simulatedResponse:
-        const RequestResponse(statusCode: 404, originalResponse: null),
+    simulatedResponse: const RequestResponse(
+      statusCode: 404,
+      originalResponse: null,
+    ),
   );
 
   final throwDatasource = GetUserDetailDatasource(driver: throwDriver)
@@ -63,13 +68,14 @@ Future<void> main(List<String> args) async {
 
   print('\n--- Cache request set ---');
 
-  final cacheRepository =
-      GetUserCacheDetailRepository(dataSource: successfulDatasource);
+  final cacheRepository = GetUserCacheDetailRepository(
+    dataSource: successfulDatasource,
+  );
   successfulDatasource.count = 0;
 
   await cacheRepository.call(repositoryParams: noParams);
 
-  await Future.delayed(const Duration(seconds: 1));
+  await Future<void>.delayed(const Duration(seconds: 1));
 
   await cacheRepository.call(repositoryParams: noParams);
 
@@ -79,7 +85,7 @@ Future<void> main(List<String> args) async {
   // Output expected: 1
 
   print('Waiting for cache expiration...');
-  await Future.delayed(const Duration(milliseconds: 1010));
+  await Future<void>.delayed(const Duration(milliseconds: 1010));
 
   await cacheRepository.call(repositoryParams: noParams);
 

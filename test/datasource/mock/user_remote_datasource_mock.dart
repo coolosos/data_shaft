@@ -1,14 +1,15 @@
 import 'dart:async';
+
 import 'package:data_shaft/src/datasources/datasource_callable.dart';
 
 class User {
-  User({required this.id, required this.name});
+  new({required this.id, required this.name});
   final String id;
   final String name;
 }
 
 final class UserParams extends Params {
-  const UserParams({required this.id});
+  const new({required this.id});
   final String id;
 
   @override
@@ -25,7 +26,7 @@ class UserDataSourceMock extends DataSourceCallable<User> {
   @override
   Future<User> call({required Params params}) async {
     callCount++;
-    await Future.delayed(delay);
+    await Future<void>.delayed(delay);
     if (params is UserParams) {
       return User(id: params.id, name: 'User ${params.id}');
     }
@@ -41,7 +42,7 @@ class UserDataSourceThrowMock extends DataSourceCallable<User> {
   @override
   Future<User> call({required Params params}) async {
     callCount++;
-    await Future.delayed(delay);
+    await Future<void>.delayed(delay);
     if (errorToThrow != null) {
       throw errorToThrow!;
     }

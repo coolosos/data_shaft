@@ -3,18 +3,18 @@ import 'package:cool_bedrock/cool_bedrock.dart' show Codable;
 import 'package:data_shaft/src/datasources/driver/remote_driver.dart';
 import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 
-/// {@template data_shaft.datasource_patch_remote}
-/// A specialized [DatasourceRemote] for handling **HTTP PATCH** operations.
+/// {@template data_shaft.datasource_head_remote}
+/// A specialized [DatasourceRemote] for handling **HTTP HEAD** operations.
 ///
-/// Use this class for partial updates to a remote resource.
-/// It leverages the [PatchCall] mixin, requiring [PatchParams] to be generated.
+/// Use this class to retrieve response metadata (headers) without the body,
+/// e.g. for resource existence checks or cache validation.
 /// {@endtemplate}
-abstract base class DatasourcePatchRemote<
+abstract base class DatasourceHeadRemote<
   RemoteObject extends Codable<Object, RemoteObject>,
   Driver extends RemoteDriver<Object?>
 >
     extends DatasourceRemote<RemoteObject, Driver>
-    with PatchCall<RemoteObject, Driver> {
-  /// {@macro data_shaft.datasource_patch_remote}
+    with HeadCall<RemoteObject, Driver> {
+  /// {@macro data_shaft.datasource_head_remote}
   new({required super.driver});
 }

@@ -1,7 +1,7 @@
 import 'package:data_shaft/data_shaft.dart';
 
 base class HttpDriver implements RemoteDriver<Object?> {
-  HttpDriver({required this.simulatedResponse});
+  new({required this.simulatedResponse});
 
   final RequestResponse<Object?> simulatedResponse;
 
@@ -10,8 +10,7 @@ base class HttpDriver implements RemoteDriver<Object?> {
     Uri uri, {
     Map<String, String>? headers,
     Object? options,
-  }) async =>
-      simulatedResponse;
+  }) async => simulatedResponse;
 
   @override
   Future<RequestResponse<Object?>> post(
@@ -20,8 +19,7 @@ base class HttpDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      simulatedResponse;
+  }) async => simulatedResponse;
 
   @override
   Future<RequestResponse<Object?>> delete(
@@ -30,8 +28,7 @@ base class HttpDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      simulatedResponse;
+  }) async => simulatedResponse;
   @override
   Future<RequestResponse<Object?>> patch(
     Uri uri, {
@@ -39,8 +36,7 @@ base class HttpDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      simulatedResponse;
+  }) async => simulatedResponse;
   @override
   Future<RequestResponse<Object?>> put(
     Uri uri, {
@@ -48,14 +44,12 @@ base class HttpDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      simulatedResponse;
+  }) async => simulatedResponse;
 
   @override
   Future<RequestResponse<Object?>> head(
     Uri url, {
     Map<String, String>? headers,
     Object? options,
-  }) async =>
-      simulatedResponse;
+  }) async => simulatedResponse;
 }

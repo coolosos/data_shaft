@@ -4,7 +4,7 @@ import '../mock_driver.dart';
 
 final class TestDeleteDataSource
     extends DatasourceDeleteRemote<MockModel, MockRemoteDriver> {
-  TestDeleteDataSource({required super.driver});
+  new({required super.driver});
 
   int callCount = 0;
 
@@ -35,8 +35,9 @@ final class TestDeleteDataSource
   }
 
   @override
-  MockModel transformation(
-      {required covariant RequestResponse remoteResponse}) {
+  MockModel transformation({
+    required covariant RequestResponse<Object?> remoteResponse,
+  }) {
     return MockModel.fromJson(remoteResponse.body!.call());
   }
 }

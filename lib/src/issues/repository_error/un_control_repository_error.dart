@@ -8,14 +8,14 @@ import 'package:cool_bedrock/cool_bedrock.dart' show RepositoryError;
 /// {@endtemplate}
 base class UnControlRepositoryError extends RepositoryError {
   /// {@macro data_shaft.uncontrol_repository_error}
-  const UnControlRepositoryError({
-    super.message = '...',
-    this.cause,
-    this.stackTrace,
-  });
+  const new({super.message = '...', this.cause, this.stackTrace});
+
+  /// The original exception/object that triggered this error, when available.
   final Object? cause;
+
+  /// The stack trace captured at the moment of the failure, when available.
   final StackTrace? stackTrace;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, cause, stackTrace];
 }

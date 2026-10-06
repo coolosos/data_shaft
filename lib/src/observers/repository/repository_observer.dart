@@ -4,7 +4,7 @@ part of 'repository_observer_instances.dart';
 /// Interface for monitoring the base lifecycle of a [Repository].
 /// {@endtemplate}
 abstract interface class RepositoryObserver implements SimpleObserver {
-  const RepositoryObserver();
+  const new();
 
   @override
   void onCreate(String repositoryName);
@@ -16,7 +16,7 @@ abstract interface class RepositoryObserver implements SimpleObserver {
 /// Observer for repositories that execute one-shot operations.
 abstract interface class RepositoryDataSourceCallableObserver
     implements RepositoryObserver {
-  const RepositoryDataSourceCallableObserver();
+  const new();
 
   /// Called just before invoking the underlying DataSource.
   ///
@@ -31,11 +31,39 @@ abstract interface class RepositoryDataSourceCallableObserver
   /// Called after the DataSource finishes execution.
   ///
   /// [endTime] is the timestamp captured right after the call completes.
-  /// [elapsed] is the duration computed from [startTime] to [endTime].
+  /// [elapsed] is the duration computed from startTime to [endTime].
   void afterCall(
     String repositoryName,
     String datasourceName,
     Object? datasourceValue, {
+    required DateTime endTime,
+    required Duration elapsed,
+  });
+}
+
+/// {@template data_shaft.repository_call_error_observer}
+/// Observer for failures raised by the DataSource while a one-shot repository
+/// call is in progress.
+///
+/// It is intentionally a separate slot from [RepositoryDataSourceCallableObserver]
+/// so existing observer implementations keep compiling: implement or assign this
+/// slot only when you need to observe thrown errors with timing information.
+///
+/// It is only invoked when the underlying call **throws**; error responses
+/// returned as [Either.left] values go through `afterCall` as usual.
+/// {@endtemplate}
+abstract interface class RepositoryCallErrorObserver {
+  const new();
+
+  /// Called when the underlying DataSource call throws.
+  ///
+  /// [endTime] is the timestamp captured right after the failure.
+  /// [elapsed] is the duration computed from startTime to [endTime].
+  void onCallError(
+    String repositoryName,
+    String datasourceName,
+    Object exception,
+    StackTrace stackTrace, {
     required DateTime endTime,
     required Duration elapsed,
   });
@@ -49,7 +77,7 @@ abstract interface class RepositoryDataSourceCallableObserver
 /// {@endtemplate}
 abstract interface class SafeCallableRepositoryObserver
     extends RepositoryDataSourceCallableObserver {
-  const SafeCallableRepositoryObserver();
+  const new();
 
   /// Logged when a known inadmissible business logic exception occurs.
   void onInadmissibleException(
@@ -84,7 +112,7 @@ abstract interface class SafeCallableRepositoryObserver
 /// {@endtemplate}
 abstract interface class RepositoryDataSourceStreamableObserver
     implements RepositoryObserver {
-  const RepositoryDataSourceStreamableObserver();
+  const new();
 
   /// Called when the repository starts listening to the underlying [DataSourceStreamable].
   ///

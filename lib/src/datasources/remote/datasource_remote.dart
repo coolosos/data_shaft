@@ -33,22 +33,27 @@ export 'request_response/request_response.dart';
 ///   (e.g., an HTTP client wrapper).
 /// {@endtemplate}
 abstract class DatasourceRemote<
-    RemoteObject extends Codable<Object, RemoteObject>,
-    Driver extends RemoteDriver> extends DataSourceCallable<RemoteObject> {
+  RemoteObject extends Codable<Object, RemoteObject>,
+  Driver extends RemoteDriver<Object?>
+>
+    extends DataSourceCallable<RemoteObject> {
   /// {@macro data_shaft.datasource_remote}
   ///
   /// The [driver] is a required dependency that facilitates all network
   /// or remote communication logic.
-  DatasourceRemote({required this.driver});
+  new({required this.driver});
 
   ///host of the provide information, can contains port and scheme
   String get host;
 
-  ///path of the provide information
+  ///`path` joined with `pathPrefix`, if any.
   String? get path;
   String? get pathPrefix => null;
 
-  ///path of the provide information
+  ///Replacement pairs applied to the request path.
+  ///
+  ///Every occurrence of each key is replaced by its value before the
+  ///request is sent (e.g. `{'{id}': '42'}`).
   Map<String, String> get pathModification => {};
 
   ///Set of http status codes that are considered admissible.
@@ -107,7 +112,7 @@ abstract class DatasourceRemote<
 
     var modifyPath = _buildPath();
     pathModification.forEach(
-      (key, value) => modifyPath = modifyPath.replaceFirst(key, value),
+      (key, value) => modifyPath = modifyPath.replaceAll(key, value),
     );
 
     final completeUri = Uri(
@@ -132,7 +137,7 @@ abstract class DatasourceRemote<
   ///Transform the information of response.body in [RemoteObject] object.
   ///This function is required because factory of T is not possible.
   FutureOr<RemoteObject> transformation({
-    required covariant RequestResponse remoteResponse,
+    required covariant RequestResponse<Object?> remoteResponse,
   });
 
   ///Usually use after server call to return the required data or failure.
@@ -140,13 +145,13 @@ abstract class DatasourceRemote<
   ///By default, [transformation] function will be call after success response.
   @mustCallSuper
   FutureOr<RemoteObject> checkInformation({
-    required covariant RequestResponse requestResponse,
+    required covariant RequestResponse<Object?> requestResponse,
     required Map<String, String>? requestHeaders,
     required Uri? requestUri,
     Object? requestBody,
   }) {
-    final responseBody = requestResponse.body?.call() ?? '';
     if (inadmissibleStatusCode.contains(requestResponse.statusCode)) {
+      final responseBody = requestResponse.body?.call() ?? '';
       observer.onInadmissibleException(
         requestResponse.statusCode,
         responseBody,
@@ -167,6 +172,7 @@ abstract class DatasourceRemote<
       );
     }
     if (!admissibleStatusCode.contains(requestResponse.statusCode)) {
+      final responseBody = requestResponse.body?.call() ?? '';
       observer.onUnControlException(
         requestResponse.statusCode,
         responseBody,
@@ -211,30 +217,47 @@ abstract class DatasourceRemote<
       datasourceName: runtimeType.toString(),
     );
 
-    final RequestResponse response;
+    final RequestResponse<Object?> response;
     try {
       response = await switch (requestParams) {
         DeleteParams() => driver.delete(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
+        ),
         PutParams() => driver.put(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
-        GetParams() => driver.get(callUri, headers: requestParams.headers),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
+        ),
+        GetParams() => driver.get(
+          callUri,
+          headers: requestParams.headers,
+          options: requestParams.driverOptions,
+        ),
+        HeadParams() => driver.head(
+          callUri,
+          headers: requestParams.headers,
+          options: requestParams.driverOptions,
+        ),
         PatchParams() => driver.patch(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
+        ),
         PostParams() => driver.post(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
+        ),
       };
     } catch (error, stackTrace) {
       observer.onDriverException(
@@ -247,7 +270,7 @@ abstract class DatasourceRemote<
       );
       rethrow;
     }
-    return checkInformation(
+    return await checkInformation(
       requestResponse: response,
       requestHeaders: requestParams.headers,
       requestUri: callUri,
@@ -258,7 +281,6 @@ abstract class DatasourceRemote<
   ///Manage the server connection.
   ///
   ///Usually use with [checkInformation] function for control server answer.
-  // Future<Info> call({required covariant Params params});
   @override
   Future<RemoteObject> call({required covariant Params params}) {
     return request(generateCallRequirement(params: params));

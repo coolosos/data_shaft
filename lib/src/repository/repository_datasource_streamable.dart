@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:data_shaft/src/repository/base_repository.dart' show Repository;
 import 'package:meta/meta.dart';
 
 import '../datasources/datasource_streamable.dart';
@@ -18,11 +19,13 @@ import 'repository_datasource.dart';
 /// * [ValueType]: The type of data emitted by the stream.
 /// * [DS]: A [DataSourceStreamable] that provides the actual stream.
 /// {@endtemplate}
-abstract class RepositoryDataSourceStreamable<ValueType,
-        DS extends DataSourceStreamable<ValueType>>
+abstract class RepositoryDataSourceStreamable<
+  ValueType,
+  DS extends DataSourceStreamable<ValueType>
+>
     extends RepositoryDataSource<DS> {
   /// Creates a [RepositoryDataSourceStreamable] with the provided [dataSource].
-  RepositoryDataSourceStreamable({required super.dataSource});
+  new({required super.dataSource});
 
   /// The observer responsible for monitoring stream lifecycle events
   /// (start, data, error, etc.).

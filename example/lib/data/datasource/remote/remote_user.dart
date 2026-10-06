@@ -1,9 +1,9 @@
 import 'package:data_shaft/data_shaft.dart';
 
 class RemoteUser extends Codable<String, RemoteUser> {
-  const RemoteUser({required this.name});
+  const new({required this.name});
 
-  factory RemoteUser.fromJson(String body) {
+  factory fromJson(String body) {
     final map = json.decode(body) as Map<String, dynamic>;
     return RemoteUser(name: map['name'] as String);
   }

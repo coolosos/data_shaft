@@ -4,9 +4,8 @@ import 'package:data_shaft_example/data/datasource/get_user_detail_datasource.da
 
 final class GetUserCacheDetailRepository
     extends DeduplicationCacheRepository<RemoteUser, GetUserDetailDatasource> {
-  GetUserCacheDetailRepository({
-    required super.dataSource,
-  }) : super(refreshDuration: const Duration(seconds: 2));
+  new({required super.dataSource})
+    : super(refreshDuration: const Duration(seconds: 2));
 
   @override
   Future<Either<RepositoryError, RemoteUser>> call({

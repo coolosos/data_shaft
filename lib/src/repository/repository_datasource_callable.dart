@@ -6,6 +6,7 @@ import 'package:cool_bedrock/cool_bedrock.dart'
 import '../datasources/datasource_callable.dart';
 import '../observers/repository/repository_observer_instances.dart';
 import 'repository_datasource.dart';
+import 'safe_repository_datasource_callable.dart';
 
 /// {@template data_shaft.repository_datasource_callable}
 /// A Repository implementation that wraps a specific [DataSourceCallable].
@@ -16,10 +17,13 @@ import 'repository_datasource.dart';
 /// **Note:** This class does NOT handle exceptions automatically.
 /// For automatic error handling, use [SafeRepositoryDatasourceCallable].
 /// {@endtemplate}
-abstract class RepositoryDataSourceCallable<ValueType,
-    DS extends DataSourceCallable<ValueType>> extends RepositoryDataSource<DS> {
+abstract class RepositoryDataSourceCallable<
+  ValueType,
+  DS extends DataSourceCallable<ValueType>
+>
+    extends RepositoryDataSource<DS> {
   /// {@macro data_shaft.repository_datasource_callable}
-  RepositoryDataSourceCallable({required super.dataSource});
+  new({required super.dataSource});
 
   RepositoryDataSourceCallableObserver get observer =>
       RepositoryObserverInstances.repositoryDatasourceCallableObserver;
@@ -38,18 +42,32 @@ abstract class RepositoryDataSourceCallable<ValueType,
       startTime: startTime,
     );
 
-    final data = await dataSource.call(params: repositoryParams);
+    try {
+      final data = await dataSource.call(params: repositoryParams);
 
-    final endTime = DateTime.now();
-    final elapsed = endTime.difference(startTime);
+      final endTime = DateTime.now();
+      final elapsed = endTime.difference(startTime);
 
-    observer.afterCall(
-      runtimeType.toString(),
-      dataSource.runtimeType.toString(),
-      data,
-      endTime: endTime,
-      elapsed: elapsed,
-    );
-    return Right(data);
+      observer.afterCall(
+        runtimeType.toString(),
+        dataSource.runtimeType.toString(),
+        data,
+        endTime: endTime,
+        elapsed: elapsed,
+      );
+      return Right(data);
+    } catch (error, stackTrace) {
+      final endTime = DateTime.now();
+      final elapsed = endTime.difference(startTime);
+      RepositoryObserverInstances.callErrorObserver.onCallError(
+        runtimeType.toString(),
+        dataSource.runtimeType.toString(),
+        error,
+        stackTrace,
+        endTime: endTime,
+        elapsed: elapsed,
+      );
+      rethrow;
+    }
   }
 }

@@ -23,10 +23,12 @@ import 'safe_repository_datasource_callable.dart';
 ///
 /// Inherits all safety features from [SafeRepositoryDatasourceCallable].
 /// {@endtemplate}
-abstract class DeduplicationRepository<Info,
-        DS extends DataSourceCallable<Info>>
+abstract class DeduplicationRepository<
+  Info,
+  DS extends DataSourceCallable<Info>
+>
     extends SafeRepositoryDatasourceCallable<Info, DS>
     with DeduplicationManagement {
   /// Creates a [DeduplicationRepository] with the provided [dataSource].
-  DeduplicationRepository({required super.dataSource});
+  new({required super.dataSource});
 }

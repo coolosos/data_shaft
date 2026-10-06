@@ -10,10 +10,11 @@ import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 /// This is the most common class for read-only operations.
 /// {@endtemplate}
 abstract base class DatasourceGetRemote<
-        RemoteObject extends Codable<Object, RemoteObject>,
-        Driver extends RemoteDriver>
+  RemoteObject extends Codable<Object, RemoteObject>,
+  Driver extends RemoteDriver<Object?>
+>
     extends DatasourceRemote<RemoteObject, Driver>
     with GetCall<RemoteObject, Driver> {
   /// {@macro data_shaft.datasource_get_remote}
-  DatasourceGetRemote({required super.driver});
+  new({required super.driver});
 }

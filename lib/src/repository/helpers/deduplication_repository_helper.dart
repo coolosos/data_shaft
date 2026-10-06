@@ -24,28 +24,37 @@ mixin DeduplicationManagement<Info, DS extends DataSourceCallable<Info>>
 
   /// Overrides the repository call to apply deduplication.
   ///
-  /// - If a call with the same [usecaseParams] is already in progress,
+  /// - If a call with the same [repositoryParams] is already in progress,
   ///   returns the existing [Future].
   /// - Otherwise, initiates a new data source call, stores the [Completer],
   ///   and completes it once the operation finishes.
+  /// - If the underlying call throws, the error is forwarded to any waiter and
+  ///   the in-flight entry is always removed, so later identical calls start a
+  ///   fresh operation instead of waiting forever.
   @override
   Future<Either<RepositoryError, Info>> call({
     required covariant Params repositoryParams,
   }) async {
     final completer = _deduplication[repositoryParams];
     if (completer != null) {
-      return completer.future;
+      final completion = await completer.future;
+      return completion;
     }
-    _deduplication[repositoryParams] = Completer();
+    final newCompleter = Completer<Either<RepositoryError, Info>>();
+    _deduplication[repositoryParams] = newCompleter;
 
-    final datasourceResponse = await super.call(
-      repositoryParams: repositoryParams,
-    );
-
-    _deduplication[repositoryParams]?.complete(datasourceResponse);
-    _deduplication.remove(repositoryParams);
-
-    return datasourceResponse;
+    try {
+      final datasourceResponse = await super.call(
+        repositoryParams: repositoryParams,
+      );
+      newCompleter.complete(datasourceResponse);
+      return datasourceResponse;
+    } catch (error, stackTrace) {
+      newCompleter.completeError(error, stackTrace);
+      rethrow;
+    } finally {
+      _deduplication.remove(repositoryParams);
+    }
   }
 }
 
@@ -80,7 +89,8 @@ mixin class DeduplicationExecution<T> {
     Future<T> Function() deduplicationFunction,
   ) async {
     if (_deduplication case final completer?) {
-      return completer.future;
+      final completion = await completer.future;
+      return completion;
     }
 
     final newCompleter = Completer<T>();

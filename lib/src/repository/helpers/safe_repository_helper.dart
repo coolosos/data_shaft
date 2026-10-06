@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cool_bedrock/cool_bedrock.dart'
-    show Either, Left, RepositoryError;
+    show Either, Left, RepositoryError, Right;
 
 import '../../issues/datasource_exception/inadmissible_data_source_exception.dart';
 import '../../issues/datasource_exception/un_control_data_source_exception.dart';
@@ -16,17 +16,19 @@ mixin SafeRepositoryHelper<ValueType> on Repository {
   RepositoryError Function(
     UnControlDataSourceException exception,
     StackTrace stackTrace,
-  ) get onUnControlException;
+  )
+  get onUnControlException;
 
   /// Maps [InadmissibleDataSourceException] (e.g., 400 Bad Request, 404 Not Found) to a [RepositoryError].
   RepositoryError Function(
     InadmissibleDataSourceException exception,
     StackTrace stackTrace,
-  ) get onInadmissibleException;
+  )
+  get onInadmissibleException;
 
   /// Maps generic or unexpected [Object] exceptions (e.g., parsing errors) to a [RepositoryError].
   RepositoryError Function(Object exception, StackTrace stackTrace)
-      get onException;
+  get onException;
 
   /// Executes a function safely, catching defined exceptions and mapping them to [Left].
   ///

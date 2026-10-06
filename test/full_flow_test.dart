@@ -9,34 +9,38 @@ import 'repository/mock/user_repository_mock.dart';
 import 'repository/repository_observer_test.dart';
 
 void main() {
-  test('Full Flow: Remote -> DataSource -> Repository (Cache + Observer)',
-      () async {
-    final driver = MockRemoteDriver();
-    final observer = TestSafeObserver();
-    RepositoryObserverInstances.safeCallableObserver = observer;
+  tearDown(RepositoryObserverInstances.reset);
 
-    final dataSource = TestGetDataSource(driver: driver);
-    final repository = UserRepositoryFlowMock(
-      dataSource: dataSource,
-      refreshDuration: const Duration(minutes: 5),
-    );
+  test(
+    'Full Flow: Remote -> DataSource -> Repository (Cache + Observer)',
+    () async {
+      final driver = MockRemoteDriver();
+      final observer = TestSafeObserver();
+      RepositoryObserverInstances.safeCallableObserver = observer;
 
-    driver.simulatedResponse = RequestResponse(
-      statusCode: 200,
-      body: () => '{"name": "Data Shaft User"}',
-      originalResponse: null,
-    );
+      final dataSource = TestGetDataSource(driver: driver);
+      final repository = UserRepositoryFlowMock(
+        dataSource: dataSource,
+        refreshDuration: const Duration(minutes: 5),
+      );
 
-    final result = await repository.call(repositoryParams: const NoParams());
+      driver.simulatedResponse = RequestResponse(
+        statusCode: 200,
+        body: () => '{"name": "Data Shaft User"}',
+        originalResponse: null,
+      );
 
-    expect(result.isRight(), true);
-    result.fold((_) => null, (user) => expect(user.name, 'Data Shaft User'));
+      final result = await repository.call(repositoryParams: const NoParams());
 
-    expect(observer.beforeCallCalled, true);
+      expect(result.isRight(), true);
+      result.fold((_) => null, (user) => expect(user.name, 'Data Shaft User'));
 
-    expect(repository.isCached(), true);
+      expect(observer.beforeCallCalled, true);
 
-    await repository.call(repositoryParams: const NoParams());
-    expect(dataSource.callCount, 1);
-  });
+      expect(repository.isCached(), true);
+
+      await repository.call(repositoryParams: const NoParams());
+      expect(dataSource.callCount, 1);
+    },
+  );
 }

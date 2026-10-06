@@ -21,7 +21,7 @@ export 'package:cool_bedrock/cool_bedrock.dart' show Params;
 /// {@endtemplate}
 abstract class DataSourceCallable<ValueType> extends DataSource {
   /// {@macro data_shaft.datasource_callable}
-  DataSourceCallable();
+  new();
 
   /// Executes the specific data operation defined by this source.
   ///

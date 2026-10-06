@@ -4,7 +4,7 @@ import 'package:data_shaft_example/data/datasource/get_user_detail_datasource.da
 
 final class GetUserDetailRepository
     extends DeduplicationRepository<RemoteUser, GetUserDetailDatasource> {
-  GetUserDetailRepository({required super.dataSource});
+  new({required super.dataSource});
 
   @override
   Future<Either<RepositoryError, RemoteUser>> call({

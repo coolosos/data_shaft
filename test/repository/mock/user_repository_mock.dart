@@ -6,24 +6,20 @@ import '../../datasource/mock/user_remote_datasource_mock.dart';
 
 class UserRepositoryMock
     extends DeduplicationCacheRepository<User, UserDataSourceMock> {
-  UserRepositoryMock({
-    required super.dataSource,
-    required super.refreshDuration,
-  });
+  new({required super.dataSource, required super.refreshDuration});
 }
 
 class UserRepositoryThrowMock
     extends DeduplicationCacheRepository<User, UserDataSourceThrowMock> {
-  UserRepositoryThrowMock({
-    required super.dataSource,
-    required super.refreshDuration,
-  });
+  new({required super.dataSource, required super.refreshDuration});
 }
 
 class UserRepositoryFlowMock
     extends DeduplicationCacheRepository<MockModel, TestGetDataSource> {
-  UserRepositoryFlowMock({
-    required super.dataSource,
-    required super.refreshDuration,
-  });
+  new({required super.dataSource, required super.refreshDuration});
+}
+
+class UserDedupRepository
+    extends DeduplicationRepository<User, UserDataSourceMock> {
+  new({required super.dataSource});
 }

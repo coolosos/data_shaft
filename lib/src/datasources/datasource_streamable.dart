@@ -20,7 +20,7 @@ export 'package:cool_bedrock/cool_bedrock.dart' show Params;
 /// {@endtemplate}
 abstract class DataSourceStreamable<T> extends DataSource {
   /// {@macro data_shaft.datasource_streamable}
-  DataSourceStreamable();
+  new();
 
   /// Returns a [Stream] that emits data of type [T] whenever the underlying
   /// data source changes.

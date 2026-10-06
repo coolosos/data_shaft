@@ -14,7 +14,7 @@ import '../observers/datasource/datasource_observer_instances.dart';
 /// {@endtemplate}
 abstract class DataSource {
   /// {@macro data_shaft.datasource}
-  DataSource() {
+  new() {
     observer.onCreate(runtimeType.toString());
   }
 

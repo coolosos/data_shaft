@@ -10,9 +10,7 @@ import 'package:cool_bedrock/cool_bedrock.dart' show RepositoryError;
 /// {@endtemplate}
 base class OnExceptionRepositoryError extends RepositoryError {
   /// {@macro data_shaft.on_exception_repository_error}
-  const OnExceptionRepositoryError({
-    super.message = 'Error during Repository orchestration',
-  });
+  const new({super.message = 'Error during Repository orchestration'});
 
   @override
   List<Object?> get props => [message];

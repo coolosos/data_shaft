@@ -1,4 +1,5 @@
 import 'package:cool_bedrock/cool_bedrock.dart';
+import 'package:data_shaft/data_shaft.dart' show DataSource, Repository;
 
 import '../datasources/datasource_callable.dart';
 import '../issues/datasource_exception/inadmissible_data_source_exception.dart';
@@ -34,12 +35,14 @@ import 'repository_datasource_callable.dart';
 /// }
 /// ```
 /// {@endtemplate}
-abstract class SafeRepositoryDatasourceCallable<Info,
-        DS extends DataSourceCallable<Info>>
+abstract class SafeRepositoryDatasourceCallable<
+  Info,
+  DS extends DataSourceCallable<Info>
+>
     extends RepositoryDataSourceCallable<Info, DS>
     with SafeRepositoryHelper<Info> {
   /// {@macro data_shaft.safe_repository}
-  SafeRepositoryDatasourceCallable({required super.dataSource});
+  new({required super.dataSource});
 
   @override
   SafeCallableRepositoryObserver get observer =>
@@ -50,7 +53,10 @@ abstract class SafeRepositoryDatasourceCallable<Info,
   Future<Either<RepositoryError, Info>> call({
     required covariant Params repositoryParams,
   }) async {
-    return safeCall(call: () => super.call(repositoryParams: repositoryParams));
+    final safeCalling = await safeCall(
+      call: () => super.call(repositoryParams: repositoryParams),
+    );
+    return safeCalling;
   }
 
   /// Default handler for uncontrolled exceptions (e.g., 500 Internal Server Error).
@@ -59,14 +65,15 @@ abstract class SafeRepositoryDatasourceCallable<Info,
   RepositoryError Function(
     UnControlDataSourceException exception,
     StackTrace stackTrace,
-  ) get onUnControlException => (exception, stackTrace) {
-        observer.onUnControlException(
-          exception,
-          stackTrace,
-          runtimeType.toString(),
-        );
-        return const UnControlRepositoryError();
-      };
+  )
+  get onUnControlException => (exception, stackTrace) {
+    observer.onUnControlException(
+      exception,
+      stackTrace,
+      runtimeType.toString(),
+    );
+    return UnControlRepositoryError(cause: exception, stackTrace: stackTrace);
+  };
 
   /// Default handler for inadmissible exceptions (e.g., 404 Not Found).
   /// Logs the error and returns [InadmissibleRepositoryError].
@@ -74,21 +81,26 @@ abstract class SafeRepositoryDatasourceCallable<Info,
   RepositoryError Function(
     InadmissibleDataSourceException exception,
     StackTrace stackTrace,
-  ) get onInadmissibleException => (exception, stackTrace) {
-        observer.onInadmissibleException(
-          exception,
-          stackTrace,
-          runtimeType.toString(),
-        );
-        return const InadmissibleRepositoryError();
-      };
+  )
+  get onInadmissibleException => (exception, stackTrace) {
+    observer.onInadmissibleException(
+      exception,
+      stackTrace,
+      runtimeType.toString(),
+    );
+    return InadmissibleRepositoryError(
+      message: exception.message,
+      statusCode: exception.statusCode,
+      body: exception.body,
+    );
+  };
 
   /// Default handler for unexpected exceptions (e.g., parsing errors).
   /// Logs the error and returns [OnExceptionRepositoryError].
   @override
   RepositoryError Function(Object exception, StackTrace stackTrace)
-      get onException => (exception, stackTrace) {
-            observer.onException(exception, stackTrace, runtimeType.toString());
-            return const OnExceptionRepositoryError();
-          };
+  get onException => (exception, stackTrace) {
+    observer.onException(exception, stackTrace, runtimeType.toString());
+    return const OnExceptionRepositoryError();
+  };
 }

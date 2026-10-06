@@ -1,6 +1,6 @@
 name: data_shaft
 description: High-level data layer for Clean Architecture with standardized Drivers, typed DataSources, and Repository mixins for caching, deduplication, and safe error handling.
-version: 2.0.0
+version: 3.0.0
 
 homepage: https://github.com/coolosos
 
@@ -15,12 +15,12 @@ topics:
   - architecture
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.13.0 <4.0.0"
 
 dependencies:
-  meta: ^1.17.0
-  cool_bedrock: ^2.0.0
+  meta: ^1.19.0
+  cool_bedrock: ^3.0.0
 
 dev_dependencies:
-  coolint: 2.1.2
-  test: ^1.28.0
+  coolint: ^3.0.0
+  test: ^1.32.0

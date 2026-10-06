@@ -1,8 +1,11 @@
+import 'package:cool_bedrock/cool_bedrock.dart';
 import 'package:data_shaft/src/issues/datasource_exception/inadmissible_data_source_exception.dart';
 import 'package:data_shaft/src/issues/datasource_exception/un_control_data_source_exception.dart';
 import 'package:data_shaft/src/issues/repository_error/inadmissible_repository_error.dart';
 import 'package:data_shaft/src/issues/repository_error/on_exception_repository_error.dart';
 import 'package:data_shaft/src/issues/repository_error/un_control_repository_error.dart';
+import 'package:data_shaft/src/repository/helpers/deduplication_repository_helper.dart';
+import 'package:data_shaft/src/repository/repository_datasource_callable.dart';
 import 'package:test/test.dart';
 
 import '../datasource/mock/user_remote_datasource_mock.dart';
@@ -28,9 +31,7 @@ void main() {
   });
 
   group('DeduplicationCacheRepository Tests', () {
-    test(
-        'Should call DataSource only once when multiple simultaneous calls are made',
-        () async {
+    test('Should call DataSource only once when multiple simultaneous calls are made', () async {
       dataSource.delay = const Duration(milliseconds: 100);
       const params = UserParams(id: '1');
 
@@ -46,18 +47,20 @@ void main() {
       }
     });
 
-    test('Should return cached data if refreshDuration has not expired',
-        () async {
-      const params = UserParams(id: '1');
+    test(
+      'Should return cached data if refreshDuration has not expired',
+      () async {
+        const params = UserParams(id: '1');
 
-      await repository.call(repositoryParams: params);
-      expect(dataSource.callCount, 1);
+        await repository.call(repositoryParams: params);
+        expect(dataSource.callCount, 1);
 
-      final result = await repository.call(repositoryParams: params);
+        final result = await repository.call(repositoryParams: params);
 
-      expect(dataSource.callCount, 1);
-      expect(result.isRight(), true);
-    });
+        expect(dataSource.callCount, 1);
+        expect(result.isRight(), true);
+      },
+    );
 
     test('Should call DataSource again after cache expires', () async {
       const params = UserParams(id: '1');
@@ -65,17 +68,49 @@ void main() {
       await repository.call(repositoryParams: params);
       expect(dataSource.callCount, 1);
 
-      await Future.delayed(const Duration(seconds: 2, milliseconds: 100));
+      await Future<void>.delayed(const Duration(seconds: 2, milliseconds: 100));
+
+      await repository.call(repositoryParams: params);
+      expect(dataSource.callCount, 2);
+    });
+
+    test('Should clear the cache forcing a new DataSource call', () async {
+      const params = UserParams(id: '1');
+
+      await repository.call(repositoryParams: params);
+      expect(repository.isCached(), true);
+
+      repository.clear();
+      expect(repository.isCached(), false);
 
       await repository.call(repositoryParams: params);
       expect(dataSource.callCount, 2);
     });
   });
 
-  group('Safe Error Handling Tests', () {
+  group('DeduplicationRepository Tests', () {
     test(
-        'Should return UnControlRepositoryError when DataSource throws UnControlDataSourceException',
-        () async {
+      'Should deduplicate simultaneous calls in a safe repository',
+      () async {
+        final dataSource = UserDataSourceMock()
+          ..delay = const Duration(milliseconds: 100);
+        final repository = UserDedupRepository(dataSource: dataSource);
+
+        final results = await Future.wait([
+          repository.call(repositoryParams: const UserParams(id: '1')),
+          repository.call(repositoryParams: const UserParams(id: '1')),
+        ]);
+
+        expect(dataSource.callCount, 1);
+        for (final result in results) {
+          expect(result.isRight(), true);
+        }
+      },
+    );
+  });
+
+  group('Safe Error Handling Tests', () {
+    test('Should return UnControlRepositoryError when DataSource throws UnControlDataSourceException', () async {
       dataSourceThrowMock.errorToThrow = const UnControlDataSourceException(
         message: 'Server Error',
         statusCode: 500,
@@ -86,15 +121,15 @@ void main() {
       );
 
       expect(result.isLeft(), true);
-      result.fold(
-        (error) => expect(error, isA<UnControlRepositoryError>()),
-        (_) => fail('Should have been a Left'),
-      );
+      result.fold((error) {
+        expect(error, isA<UnControlRepositoryError>());
+        final uncontrol = error as UnControlRepositoryError;
+        expect(uncontrol.cause, isA<UnControlDataSourceException>());
+        expect(uncontrol.stackTrace, isNotNull);
+      }, (_) => fail('Should have been a Left'));
     });
 
-    test(
-        'Should return InadmissibleRepositoryError when DataSource throws InadmissibleDataSourceException',
-        () async {
+    test('Should return InadmissibleRepositoryError when DataSource throws InadmissibleDataSourceException', () async {
       dataSourceThrowMock.errorToThrow = const InadmissibleDataSourceException(
         message: 'Not Found',
         body: 'Not Found',
@@ -106,15 +141,15 @@ void main() {
       );
 
       expect(result.isLeft(), true);
-      result.fold(
-        (error) => expect(error, isA<InadmissibleRepositoryError>()),
-        (_) => fail('Should have been a Left'),
-      );
+      result.fold((error) {
+        expect(error, isA<InadmissibleRepositoryError>());
+        final inadmissible = error as InadmissibleRepositoryError;
+        expect(inadmissible.statusCode, 404);
+        expect(inadmissible.body, 'Not Found');
+      }, (_) => fail('Should have been a Left'));
     });
 
-    test(
-        'Should return OnExceptionRepositoryError for unexpected generic exceptions',
-        () async {
+    test('Should return OnExceptionRepositoryError for unexpected generic exceptions', () async {
       dataSourceThrowMock.errorToThrow = Exception('Unexpected logic error');
 
       final result = await repositoryThrow.call(
@@ -140,21 +175,135 @@ void main() {
       expect(dataSourceThrowMock.callCount, 2);
       expect(repositoryThrow.isCached(), true);
     });
-    test('Simultaneous calls should all receive the same error result',
-        () async {
-      dataSourceThrowMock
-        ..errorToThrow = const UnControlDataSourceException(message: 'Fail')
-        ..delay = const Duration(milliseconds: 50);
 
-      final results = await Future.wait([
-        repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
-        repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
-      ]);
+    test('A failed call clears the cache (null = clear)', () async {
+      dataSourceThrowMock.errorToThrow = null;
+      const params = UserParams(id: '1');
 
-      expect(results[0].isLeft(), true);
-      expect(results[1].isLeft(), true);
+      await repositoryThrow.call(repositoryParams: params);
+      expect(dataSourceThrowMock.callCount, 1);
+      expect(repositoryThrow.isCached(), true);
 
-      expect(results[0], results[1]);
+      await Future<void>.delayed(const Duration(seconds: 2, milliseconds: 100));
+
+      dataSourceThrowMock.errorToThrow = Exception('Network down');
+      final failedCall = await repositoryThrow.call(repositoryParams: params);
+
+      expect(failedCall.isLeft(), true);
+      expect(dataSourceThrowMock.callCount, 2);
+      expect(
+        repositoryThrow.isCached(),
+        false,
+        reason: 'a null refreshCache result clears the last cached value',
+      );
+      expect(repositoryThrow.cache, isNull);
     });
+
+    test(
+      'refreshCache override can keep the last valid cache on failure',
+      () async {
+        final keepRepository = KeepLastCacheRepository(
+          dataSource: dataSourceThrowMock,
+          refreshDuration: const Duration(seconds: 2),
+        );
+        dataSourceThrowMock.errorToThrow = null;
+        const params = UserParams(id: '1');
+
+        await keepRepository.call(repositoryParams: params);
+        expect(dataSourceThrowMock.callCount, 1);
+        expect(keepRepository.isCached(), true);
+
+        await Future<void>.delayed(
+          const Duration(seconds: 2, milliseconds: 100),
+        );
+
+        dataSourceThrowMock.errorToThrow = Exception('Network down');
+        final failedCall = await keepRepository.call(repositoryParams: params);
+
+        expect(failedCall.isLeft(), true);
+        expect(dataSourceThrowMock.callCount, 2);
+        expect(
+          keepRepository.isCached(),
+          true,
+          reason: 'the override keeps the last valid value on failure',
+        );
+        expect(keepRepository.cache?.name, 'User 1');
+      },
+    );
+
+    test(
+      'Dedup key is released when the datasource call throws (no deadlock)',
+      () async {
+        final datasource = UserDataSourceThrowMock()
+          ..errorToThrow = Exception('boom')
+          ..delay = const Duration(milliseconds: 10);
+        final repository = _ThrowingDedupRepository(dataSource: datasource);
+
+        await expectLater(
+          Future.wait([
+            repository.call(repositoryParams: const UserParams(id: '1')),
+            repository.call(repositoryParams: const UserParams(id: '1')),
+          ]),
+          throwsException,
+        );
+        expect(datasource.callCount, 1);
+
+        datasource.errorToThrow = null;
+        final retry = await repository.call(
+          repositoryParams: const UserParams(id: '1'),
+        );
+        final retryUser = retry.fold(
+          (_) => fail('Expected a Right result'),
+          (user) => user,
+        );
+
+        expect(retryUser.name, 'User 1');
+        expect(
+          datasource.callCount,
+          2,
+          reason: 'after a failure the same params must start a new call',
+        );
+      },
+    );
+    test(
+      'Simultaneous calls should all receive the same error result',
+      () async {
+        dataSourceThrowMock
+          ..errorToThrow = const UnControlDataSourceException(message: 'Fail')
+          ..delay = const Duration(milliseconds: 50);
+
+        final results = await Future.wait([
+          repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
+          repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
+        ]);
+
+        expect(results[0].isLeft(), true);
+        expect(results[1].isLeft(), true);
+
+        expect(results[0], results[1]);
+      },
+    );
   });
+}
+
+/// Non-safe repository: the datasource error propagates as a thrown exception
+/// (no safety net), which exercises the deduplication deadlock regression.
+class _ThrowingDedupRepository
+    extends RepositoryDataSourceCallable<User, UserDataSourceThrowMock>
+    with DeduplicationManagement<User, UserDataSourceThrowMock> {
+  new({required super.dataSource});
+}
+
+/// Demonstrates the `refreshCache` extension point: on a failed call it
+/// returns the previous cache value instead of `null`, so the last good data
+/// survives a failed refresh.
+class KeepLastCacheRepository extends UserRepositoryThrowMock {
+  new({required super.dataSource, required super.refreshDuration});
+
+  @override
+  User? refreshCache({
+    required Either<RepositoryError, User> datasourceResponse,
+  }) {
+    return datasourceResponse.toNullable() ?? cache;
+  }
 }

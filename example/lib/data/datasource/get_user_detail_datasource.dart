@@ -6,7 +6,7 @@ export 'package:data_shaft_example/data/datasource/remote/remote_user.dart';
 
 final class GetUserDetailDatasource
     extends DatasourceGetRemote<RemoteUser, HttpDriver> {
-  GetUserDetailDatasource({required super.driver});
+  new({required super.driver});
 
   int count = 0;
   Exception? throwException;
@@ -41,8 +41,9 @@ final class GetUserDetailDatasource
   }
 
   @override
-  RemoteUser transformation(
-      {required covariant RequestResponse remoteResponse}) {
+  RemoteUser transformation({
+    required covariant RequestResponse<Object?> remoteResponse,
+  }) {
     return RemoteUser.fromJson(remoteResponse.body?.call() ?? '');
   }
 }

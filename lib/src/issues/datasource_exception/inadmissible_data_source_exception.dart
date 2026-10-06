@@ -14,7 +14,7 @@ import 'package:cool_bedrock/cool_bedrock.dart' show DataSourceException;
 /// {@endtemplate}
 final class InadmissibleDataSourceException extends DataSourceException {
   /// {@macro data_shaft.inadmissible_exception}
-  const InadmissibleDataSourceException({
+  const new({
     required this.body,
     required this.statusCode,
     super.requestHeaders,

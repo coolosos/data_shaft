@@ -72,6 +72,28 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
   }
 }
 
+class RecordingCallErrorObserver implements RepositoryCallErrorObserver {
+  int callCount = 0;
+  Object? lastException;
+  StackTrace? lastStackTrace;
+  Duration? lastElapsed;
+
+  @override
+  void onCallError(
+    String repositoryName,
+    String datasourceName,
+    Object exception,
+    StackTrace stackTrace, {
+    required DateTime endTime,
+    required Duration elapsed,
+  }) {
+    callCount++;
+    lastException = exception;
+    lastStackTrace = stackTrace;
+    lastElapsed = elapsed;
+  }
+}
+
 void main() {
   tearDown(RepositoryObserverInstances.reset);
 
@@ -122,18 +144,51 @@ void main() {
     });
   });
 
+  group('callErrorObserver', () {
+    test('should notify onCallError when the datasource call throws', () async {
+      final errorObserver = RecordingCallErrorObserver();
+      RepositoryObserverInstances.callErrorObserver = errorObserver;
+
+      final datasource = UserDataSourceThrowMock()
+        ..errorToThrow = Exception('Boom');
+      final repository = UserRepositoryThrowMock(
+        dataSource: datasource,
+        refreshDuration: const Duration(seconds: 1),
+      );
+
+      final result = await repository.call(
+        repositoryParams: const UserParams(id: '1'),
+      );
+
+      expect(result.isLeft(), true);
+      expect(errorObserver.callCount, 1);
+      expect(errorObserver.lastException, isA<Exception>());
+      expect(errorObserver.lastStackTrace, isNotNull);
+      expect(errorObserver.lastElapsed, isNotNull);
+    });
+
+    test('should NOT notify onCallError on a successful call', () async {
+      final errorObserver = RecordingCallErrorObserver();
+      RepositoryObserverInstances.callErrorObserver = errorObserver;
+
+      final repository = UserRepositoryMock(
+        dataSource: UserDataSourceMock(),
+        refreshDuration: const Duration(seconds: 1),
+      );
+
+      await repository.call(repositoryParams: const UserParams(id: '1'));
+
+      expect(errorObserver.callCount, 0);
+    });
+  });
+
   group('useHigherObserver', () {
-    test(
-        'flag=false: repositoryObserver does NOT fallback to safeCallableObserver',
-        () {
+    test('flag=false: repositoryObserver does NOT fallback to safeCallableObserver', () {
       final safeObs = TestSafeObserver();
       RepositoryObserverInstances.safeCallableObserver = safeObs;
 
       expect(
-        identical(
-          RepositoryObserverInstances.repositoryObserver,
-          safeObs,
-        ),
+        identical(RepositoryObserverInstances.repositoryObserver, safeObs),
         false,
       );
       expect(
@@ -146,30 +201,28 @@ void main() {
     });
 
     test(
-        'flag=true: repositoryObserver and repositoryDatasourceCallableObserver '
-        'fallback to safeCallableObserver', () {
-      final safeObs = TestSafeObserver();
-      RepositoryObserverInstances.safeCallableObserver = safeObs;
-      RepositoryObserverInstances.useHigherObserver = true;
+      'flag=true: repositoryObserver and repositoryDatasourceCallableObserver '
+      'fallback to safeCallableObserver',
+      () {
+        final safeObs = TestSafeObserver();
+        RepositoryObserverInstances.safeCallableObserver = safeObs;
+        RepositoryObserverInstances.useHigherObserver = true;
 
-      expect(
-        identical(
-          RepositoryObserverInstances.repositoryObserver,
-          safeObs,
-        ),
-        true,
-      );
-      expect(
-        identical(
-          RepositoryObserverInstances.repositoryDatasourceCallableObserver,
-          safeObs,
-        ),
-        true,
-      );
-    });
+        expect(
+          identical(RepositoryObserverInstances.repositoryObserver, safeObs),
+          true,
+        );
+        expect(
+          identical(
+            RepositoryObserverInstances.repositoryDatasourceCallableObserver,
+            safeObs,
+          ),
+          true,
+        );
+      },
+    );
 
-    test(
-        'flag=true: repositoryDatasourceCallableObserver is used as fallback '
+    test('flag=true: repositoryDatasourceCallableObserver is used as fallback '
         'for repositoryObserver', () {
       final callableObs = TestSafeObserver();
       RepositoryObserverInstances.repositoryDatasourceCallableObserver =
@@ -177,72 +230,74 @@ void main() {
       RepositoryObserverInstances.useHigherObserver = true;
 
       expect(
-        identical(
-          RepositoryObserverInstances.repositoryObserver,
-          callableObs,
-        ),
+        identical(RepositoryObserverInstances.repositoryObserver, callableObs),
         true,
       );
     });
 
-    test('flag=true: explicit assignment still takes priority over fallback',
-        () {
-      final explicitObs = TestSafeObserver();
-      final safeObs = TestSafeObserver();
-      RepositoryObserverInstances.repositoryObserver = explicitObs;
-      RepositoryObserverInstances.safeCallableObserver = safeObs;
-      RepositoryObserverInstances.useHigherObserver = true;
+    test(
+      'flag=true: explicit assignment still takes priority over fallback',
+      () {
+        final explicitObs = TestSafeObserver();
+        final safeObs = TestSafeObserver();
+        RepositoryObserverInstances.repositoryObserver = explicitObs;
+        RepositoryObserverInstances.safeCallableObserver = safeObs;
+        RepositoryObserverInstances.useHigherObserver = true;
 
-      expect(
-        identical(
-          RepositoryObserverInstances.repositoryObserver,
-          explicitObs,
-        ),
-        true,
-      );
-    });
+        expect(
+          identical(
+            RepositoryObserverInstances.repositoryObserver,
+            explicitObs,
+          ),
+          true,
+        );
+      },
+    );
 
-    test('flag=true with no observers set returns default without throwing',
-        () {
-      RepositoryObserverInstances.useHigherObserver = true;
+    test(
+      'flag=true with no observers set returns default without throwing',
+      () {
+        RepositoryObserverInstances.useHigherObserver = true;
 
-      expect(RepositoryObserverInstances.repositoryObserver, isNotNull);
-      expect(
-        RepositoryObserverInstances.repositoryDatasourceCallableObserver,
-        isNotNull,
-      );
-    });
+        expect(RepositoryObserverInstances.repositoryObserver, isNotNull);
+        expect(
+          RepositoryObserverInstances.repositoryDatasourceCallableObserver,
+          isNotNull,
+        );
+      },
+    );
   });
 
   group('default observer implementations', () {
     test(
-        '_DefaultRepositoryImp should handle onDispose, beforeCall and afterCall',
-        () async {
-      final dataSource = UserDataSourceMock();
-      final repo = _DirectCallableRepo(dataSource: dataSource);
+      '_DefaultRepositoryImp should handle onDispose, beforeCall and afterCall',
+      () async {
+        final dataSource = UserDataSourceMock();
+        final repo = _DirectCallableRepo(dataSource: dataSource);
 
-      final result = await repo.call(
-        repositoryParams: const UserParams(id: '1'),
-      );
+        final result = await repo.call(
+          repositoryParams: const UserParams(id: '1'),
+        );
 
-      expect(result.isRight(), true);
-      repo.dispose();
-    });
-
-    test('_DefaultSafeRepository should handle onCreate and onDispose',
-        () async {
-      final repo = UserRepositoryMock(
-        dataSource: UserDataSourceMock(),
-        refreshDuration: const Duration(seconds: 1),
-      );
-
-      // ignore: cascade_invocations
-      repo.dispose();
-    });
+        expect(result.isRight(), true);
+        repo.dispose();
+      },
+    );
 
     test(
-        '_DefaultRepositoryDataSourceStreamableObserverImpl should handle lifecycle',
-        () async {
+      '_DefaultSafeRepository should handle onCreate and onDispose',
+      () async {
+        final repo = UserRepositoryMock(
+          dataSource: UserDataSourceMock(),
+          refreshDuration: const Duration(seconds: 1),
+        );
+
+        // ignore: cascade_invocations Test
+        repo.dispose();
+      },
+    );
+
+    test('_DefaultRepositoryDataSourceStreamableObserverImpl should handle lifecycle', () async {
       final dataSource = _StreamableDataSourceMock();
       final repo = _StreamableRepoMock(dataSource: dataSource);
 
@@ -252,16 +307,14 @@ void main() {
       repo.dispose();
     });
 
-    test(
-        '_DefaultSafeRepository.onCreate and onDispose are callable through '
+    test('_DefaultSafeRepository.onCreate and onDispose are callable through '
         'the public getter', () {
       RepositoryObserverInstances.safeCallableObserver
         ..onCreate('test_repo')
         ..onDispose('test_repo');
     });
 
-    test(
-        '_DefaultRepositoryDataSourceStreamableObserverImpl.onCreate and '
+    test('_DefaultRepositoryDataSourceStreamableObserverImpl.onCreate and '
         'onDispose are callable through the public getter', () {
       RepositoryObserverInstances.repositoryDataSourceStreamableObserver
         ..onCreate('test_repo')
@@ -272,7 +325,7 @@ void main() {
 
 class _DirectCallableRepo
     extends RepositoryDataSourceCallable<User, UserDataSourceMock> {
-  _DirectCallableRepo({required super.dataSource});
+  new({required super.dataSource});
 }
 
 class _StreamableDataSourceMock extends DataSourceStreamable<String> {
@@ -284,5 +337,5 @@ class _StreamableDataSourceMock extends DataSourceStreamable<String> {
 
 class _StreamableRepoMock
     extends RepositoryDataSourceStreamable<String, _StreamableDataSourceMock> {
-  _StreamableRepoMock({required super.dataSource});
+  new({required super.dataSource});
 }

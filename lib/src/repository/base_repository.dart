@@ -14,7 +14,7 @@ import '../observers/repository/repository_observer_instances.dart';
 /// {@endtemplate}
 abstract class Repository {
   /// {@macro data_shaft.repository}
-  Repository() {
+  new() {
     RepositoryObserverInstances.repositoryObserver.onCreate(
       runtimeType.toString(),
     );

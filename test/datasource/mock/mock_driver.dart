@@ -6,9 +6,9 @@ import 'package:data_shaft/src/datasources/driver/remote_driver.dart';
 import 'package:data_shaft/src/datasources/remote/request_response/request_response.dart';
 
 class MockModel extends Codable<String, MockModel> {
-  const MockModel({required this.name});
+  const new({required this.name});
 
-  factory MockModel.fromJson(String body) {
+  factory fromJson(String body) {
     final map = json.decode(body) as Map<String, dynamic>;
     return MockModel(name: map['name'] as String);
   }
@@ -39,6 +39,8 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
   Uri? lastUri;
   Object? lastBody;
   Map<String, String>? lastHeaders;
+  Encoding? lastEncoding;
+  Object? lastOptions;
 
   @override
   Future<RequestResponse<Object?>> get(
@@ -48,6 +50,7 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
   }) async {
     lastUri = uri;
     lastHeaders = headers;
+    lastOptions = options;
     if (throwable case final throwable?) {
       throw throwable;
     }
@@ -65,6 +68,8 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     lastUri = uri;
     lastBody = body;
     lastHeaders = headers;
+    lastEncoding = encoding;
+    lastOptions = options;
     if (throwable case final throwable?) {
       throw throwable;
     }
@@ -78,8 +83,13 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      post(uri, body: body, headers: headers);
+  }) => post(
+    uri,
+    body: body,
+    headers: headers,
+    encoding: encoding,
+    options: options,
+  );
   @override
   Future<RequestResponse<Object?>> patch(
     Uri uri, {
@@ -87,8 +97,13 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      post(uri, body: body, headers: headers);
+  }) => post(
+    uri,
+    body: body,
+    headers: headers,
+    encoding: encoding,
+    options: options,
+  );
   @override
   Future<RequestResponse<Object?>> put(
     Uri uri, {
@@ -96,14 +111,18 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) async =>
-      post(uri, body: body, headers: headers);
+  }) => post(
+    uri,
+    body: body,
+    headers: headers,
+    encoding: encoding,
+    options: options,
+  );
 
   @override
   Future<RequestResponse<Object?>> head(
     Uri url, {
     Map<String, String>? headers,
     Object? options,
-  }) =>
-      post(url, body: null, headers: headers);
+  }) => post(url, body: null, headers: headers, options: options);
 }

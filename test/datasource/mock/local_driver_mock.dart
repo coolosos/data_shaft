@@ -1,3 +1,5 @@
+// ignore_for_file: no_dynamic_casts Test
+
 import 'package:data_shaft/src/datasources/driver/driver.dart';
 
 class MockLocalDriver implements Driver {
