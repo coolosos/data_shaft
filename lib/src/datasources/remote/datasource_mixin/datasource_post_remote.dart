@@ -16,7 +16,7 @@ import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 ///   CreateUserDatasource({required super.driver});
 ///
 ///   @override
-///   PostParams? generateCallRequirement({required UserParams params}) {
+///   PostParams generateCallRequirement({required covariant UserParams params}) {
 ///     return PostParams(encodeBody: () => json.encode(params.toJson()));
 ///   }
 /// }

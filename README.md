@@ -18,7 +18,7 @@ This package eliminates boilerplate code and solves common challenges such as er
 ## ✨ Key Features
 
 * ✅ **Standardized Remote Drivers**: Decouple your app from HTTP clients (Dio, Http, etc.).
-* ✅ **Typed DataSources**: Specialized mixins for GET, POST, PUT, PATCH, and DELETE operations.
+* ✅ **Typed DataSources**: Specialized mixins for GET, HEAD, POST, PUT, PATCH, and DELETE operations.
 * ✅ **Advanced Repository Mixins**: Built-in Memory Cache, Request Deduplication, and Safe Execution.
 * ✅ **Full Observability**: Lifecycle and network logging powered by `dart:developer`.
 * ✅ **Structured Error Handling**: Automatic mapping from `DataSource` exceptions to `Repository` errors.
@@ -49,38 +49,53 @@ class DioRemoteDriver implements RemoteDriver<Response> {
     );
   }
 
-  // Implement post, put, patch, delete following the same pattern...
+  // Implement head, post, put, patch and delete following the same pattern
+  // (forward `encoding` and `options` when needed)...
 }
 ```
 ### 2. DataSource
 #### 2.1 Datasource Pre-build class
 DataSources are specialized for specific operations. Use the pre-built base classes to save time:
 ```dart
+final class UserParams extends Params {
+  const new({required this.id, required this.name});
+  final String id;
+  final String name;
+
+  @override
+  List<Object?> get props => [id, name];
+
+  @override
+  bool get isValid => id.isNotEmpty;
+}
+
 class GetUserDataSource extends DatasourceGetRemote<User, MyDriver> {
   new({required super.driver});
 
   @override
-  GetParams? generateCallRequirement({required Params params}) {
+  GetParams generateCallRequirement({required covariant UserParams params}) {
     return GetParams(urlParams: {'id': params.id});
   }
 }
 ```
 
-#### 2.1 Datasource using Mixins
+#### 2.2 DataSource using Mixins
 You can use mixins directly on a `DatasourceRemote` to define request behavior without deep inheritance:
 ```dart
-class UpdateUserDataSource extends DatasourceRemote<User, DioRemoteDriver> 
+class UpdateUserDataSource extends DatasourceRemote<User, DioRemoteDriver>
     with PatchCall<User, DioRemoteDriver> {
   new({required super.driver});
 
   @override
-  PatchParams generateCallRequirement({required Params params}) {
+  PatchParams generateCallRequirement({required covariant UserParams params}) {
     return PatchParams(
       encodeBody: () => json.encode({'name': params.name}),
     );
   }
 }
 ```
+There is also a `DatasourceHeadRemote`/`HeadCall` for **HEAD** requests (no payload), useful for
+checking resource existence or fetching response headers only.
 ### 3. Safe Repository Execution
 The `SafeRepositoryDatasourceCallable` catches all exceptions and converts them into `Either` types, shielding your Domain layer from crashes:
 
@@ -155,9 +170,14 @@ The framework manages three error levels to ensure your UI never receives an unh
 
 ### ⏱ Smart Caching
 Use `SafeMemoryCacheRepository` to get an out-of-the-box memory cache with a configurable `refreshDuration`.
+A failed refresh never discards the last valid cached value: your users keep seeing the last good data
+even while the network is down.
 
 ### 👯 Deduplication
-Prevent redundant requests. If two identical calls are triggered simultaneously, `DeduplicationManagement` ensures both wait for the same result, saving bandwidth and backend resources.
+Prevent redundant requests. If two identical calls are triggered simultaneously, `DeduplicationManagement`
+ensures both wait for the same result, saving bandwidth and backend resources. If the underlying call
+throws, every waiter receives the same error and the in-flight key is released, so retries always start
+a fresh call.
 
 ---
 
@@ -186,9 +206,15 @@ DatasourceObserverInstances.useHigherObserver = true;
 
 The same applies to repositories: `RepositoryObserverInstances.useHigherObserver = true` makes your `safeCallableObserver` serve as fallback for `repositoryObserver` and `repositoryDatasourceCallableObserver`.
 
+To observe thrown DataSource failures at the repository level (with timing info), assign a `RepositoryCallErrorObserver`:
+
+```dart
+RepositoryObserverInstances.callErrorObserver = MyCallErrorReporter();
+```
+
 ## 📚 API Reference
 
-Check the full API reference, including all generic types and abstract classes, on [pub.dev → cool_bedrock](https://pub.dev/documentation/cool_bedrock/latest/).
+Check the full API reference, including all generic types and abstract classes, on [pub.dev → data_shaft](https://pub.dev/documentation/data_shaft/latest/).
 
 ---
 
