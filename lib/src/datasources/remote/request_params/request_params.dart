@@ -14,7 +14,7 @@ part 'put_params.dart';
 /// {@endtemplate}
 sealed class RequestParams {
   /// {@macro data_shaft.request_params}
-  const RequestParams({
+  const new({
     this.headers,
     this.encodeBody,
     this.urlParams,
@@ -61,11 +61,11 @@ sealed class RequestParams {
     // Logic to merge existing query params with new ones
     final queryParams =
         (uri.queryParameters.isNotEmpty || (urlParams?.isNotEmpty ?? false))
-            ? {
-                if (uri.queryParameters.isNotEmpty) ...uri.queryParameters,
-                if (urlParams != null) ...urlParams,
-              }
-            : null;
+        ? {
+            if (uri.queryParameters.isNotEmpty) ...uri.queryParameters,
+            ...?urlParams,
+          }
+        : null;
 
     return uri.replace(queryParameters: queryParams);
   }

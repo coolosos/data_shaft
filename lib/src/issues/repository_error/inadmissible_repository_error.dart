@@ -1,4 +1,6 @@
 import 'package:cool_bedrock/cool_bedrock.dart' show RepositoryError;
+import 'package:data_shaft/data_shaft.dart'
+    show DataSource, InadmissibleDataSourceException;
 
 /// {@template data_shaft.inadmissible_repository_error}
 /// Error representing a **controlled business failure** that originated in the [DataSource].
@@ -9,9 +11,7 @@ import 'package:cool_bedrock/cool_bedrock.dart' show RepositoryError;
 /// {@endtemplate}
 base class InadmissibleRepositoryError extends RepositoryError {
   /// {@macro data_shaft.inadmissible_repository_error}
-  const InadmissibleRepositoryError({
-    super.message = 'Inadmissible result from Data Source',
-  });
+  const new({super.message = 'Inadmissible result from Data Source'});
 
   @override
   List<Object?> get props => [message];

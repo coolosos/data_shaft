@@ -4,5 +4,5 @@ part of 'request_params.dart';
 ///
 /// Typically excludes [encodeBody] as GET requests should not have a payload.
 base class GetParams extends RequestParams {
-  const GetParams({super.headers, super.urlParams, super.driverOptions});
+  const new({super.headers, super.urlParams, super.driverOptions});
 }

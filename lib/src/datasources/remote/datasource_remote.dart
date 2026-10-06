@@ -33,13 +33,15 @@ export 'request_response/request_response.dart';
 ///   (e.g., an HTTP client wrapper).
 /// {@endtemplate}
 abstract class DatasourceRemote<
-    RemoteObject extends Codable<Object, RemoteObject>,
-    Driver extends RemoteDriver> extends DataSourceCallable<RemoteObject> {
+  RemoteObject extends Codable<Object, RemoteObject>,
+  Driver extends RemoteDriver
+>
+    extends DataSourceCallable<RemoteObject> {
   /// {@macro data_shaft.datasource_remote}
   ///
   /// The [driver] is a required dependency that facilitates all network
   /// or remote communication logic.
-  DatasourceRemote({required this.driver});
+  new({required this.driver});
 
   ///host of the provide information, can contains port and scheme
   String get host;
@@ -215,26 +217,26 @@ abstract class DatasourceRemote<
     try {
       response = await switch (requestParams) {
         DeleteParams() => driver.delete(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+        ),
         PutParams() => driver.put(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+        ),
         GetParams() => driver.get(callUri, headers: requestParams.headers),
         PatchParams() => driver.patch(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+        ),
         PostParams() => driver.post(
-            callUri,
-            headers: requestParams.headers,
-            body: body,
-          ),
+          callUri,
+          headers: requestParams.headers,
+          body: body,
+        ),
       };
     } catch (error, stackTrace) {
       observer.onDriverException(

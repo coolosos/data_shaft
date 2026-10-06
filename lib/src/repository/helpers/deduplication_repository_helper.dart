@@ -24,7 +24,7 @@ mixin DeduplicationManagement<Info, DS extends DataSourceCallable<Info>>
 
   /// Overrides the repository call to apply deduplication.
   ///
-  /// - If a call with the same [usecaseParams] is already in progress,
+  /// - If a call with the same [repositoryParams] is already in progress,
   ///   returns the existing [Future].
   /// - Otherwise, initiates a new data source call, stores the [Completer],
   ///   and completes it once the operation finishes.
@@ -34,7 +34,8 @@ mixin DeduplicationManagement<Info, DS extends DataSourceCallable<Info>>
   }) async {
     final completer = _deduplication[repositoryParams];
     if (completer != null) {
-      return completer.future;
+      final completion = await completer.future;
+      return completion;
     }
     _deduplication[repositoryParams] = Completer();
 
@@ -80,7 +81,8 @@ mixin class DeduplicationExecution<T> {
     Future<T> Function() deduplicationFunction,
   ) async {
     if (_deduplication case final completer?) {
-      return completer.future;
+      final completion = await completer.future;
+      return completion;
     }
 
     final newCompleter = Completer<T>();

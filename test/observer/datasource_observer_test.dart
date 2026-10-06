@@ -46,9 +46,7 @@ void main() {
   });
 
   group('useHigherObserver', () {
-    test(
-        'flag=false: datasourceObserver does NOT fallback to httpDatasourceObserver',
-        () {
+    test('flag=false: datasourceObserver does NOT fallback to httpDatasourceObserver', () {
       final httpObs = CustomRemoteObserver();
       DatasourceObserverInstances.httpDatasourceObserver = httpObs;
 
@@ -56,19 +54,19 @@ void main() {
       expect(identical(resolved, httpObs), false);
     });
 
-    test('flag=true: datasourceObserver falls back to httpDatasourceObserver',
-        () {
-      final httpObs = CustomRemoteObserver();
-      DatasourceObserverInstances.httpDatasourceObserver = httpObs;
-      DatasourceObserverInstances.useHigherObserver = true;
-
-      final resolved = DatasourceObserverInstances.datasourceObserver;
-      expect(identical(resolved, httpObs), true);
-    });
-
     test(
-        'flag=true: explicit datasourceObserver takes priority over httpDatasourceObserver',
-        () {
+      'flag=true: datasourceObserver falls back to httpDatasourceObserver',
+      () {
+        final httpObs = CustomRemoteObserver();
+        DatasourceObserverInstances.httpDatasourceObserver = httpObs;
+        DatasourceObserverInstances.useHigherObserver = true;
+
+        final resolved = DatasourceObserverInstances.datasourceObserver;
+        expect(identical(resolved, httpObs), true);
+      },
+    );
+
+    test('flag=true: explicit datasourceObserver takes priority over httpDatasourceObserver', () {
       final explicitObs = CustomDatasourceObserver();
       final httpObs = CustomRemoteObserver();
       DatasourceObserverInstances.datasourceObserver = explicitObs;
@@ -79,12 +77,14 @@ void main() {
       expect(identical(resolved, explicitObs), true);
     });
 
-    test('flag=true with no observers set returns default without throwing',
-        () {
-      DatasourceObserverInstances.useHigherObserver = true;
+    test(
+      'flag=true with no observers set returns default without throwing',
+      () {
+        DatasourceObserverInstances.useHigherObserver = true;
 
-      final resolved = DatasourceObserverInstances.datasourceObserver;
-      expect(resolved, isNotNull);
-    });
+        final resolved = DatasourceObserverInstances.datasourceObserver;
+        expect(resolved, isNotNull);
+      },
+    );
   });
 }

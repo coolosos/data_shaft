@@ -15,15 +15,14 @@ import 'safe_repository_datasource_callable.dart';
 /// 3. If cache is expired or missing, call the datasource.
 /// 4. If the call is successful, update the cache via [refreshCache].
 /// {@endtemplate}
-abstract class SafeMemoryCacheRepository<Info,
-        DS extends DataSourceCallable<Info>>
+abstract class SafeMemoryCacheRepository<
+  Info,
+  DS extends DataSourceCallable<Info>
+>
     extends SafeRepositoryDatasourceCallable<Info, DS>
     with MemoryCacheHelper<Info> {
   /// {@macro data_shaft.safe_memory_cache_repository}
-  SafeMemoryCacheRepository({
-    required super.dataSource,
-    required this.refreshDuration,
-  });
+  new({required super.dataSource, required this.refreshDuration});
 
   @override
   final Duration refreshDuration;

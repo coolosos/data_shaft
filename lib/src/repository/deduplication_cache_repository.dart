@@ -1,3 +1,6 @@
+import 'package:data_shaft/data_shaft.dart'
+    show DataSource, Repository, RepositoryError;
+
 import '../datasources/datasource_callable.dart';
 import 'helpers/deduplication_repository_helper.dart';
 import 'safe_memory_cache_repository.dart';
@@ -20,15 +23,15 @@ import 'safe_memory_cache_repository.dart';
 /// * [Info]: The data model type.
 /// * [DS]: The [DataSourceCallable] used to fetch the data.
 /// {@endtemplate}
-abstract class DeduplicationCacheRepository<Info,
-        DS extends DataSourceCallable<Info>>
-    extends SafeMemoryCacheRepository<Info, DS> with DeduplicationManagement {
+abstract class DeduplicationCacheRepository<
+  Info,
+  DS extends DataSourceCallable<Info>
+>
+    extends SafeMemoryCacheRepository<Info, DS>
+    with DeduplicationManagement {
   /// Creates a [DeduplicationCacheRepository].
   ///
   /// Requires a [dataSource] and a [refreshDuration] to determine
   /// how long the cache remains valid.
-  DeduplicationCacheRepository({
-    required super.dataSource,
-    required super.refreshDuration,
-  });
+  new({required super.dataSource, required super.refreshDuration});
 }

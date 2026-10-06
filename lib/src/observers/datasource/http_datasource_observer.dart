@@ -11,7 +11,7 @@ part of 'datasource_observer_instances.dart';
 abstract interface class HttpDatasourceObserver
     implements SimpleDatasourceObserver {
   /// {@macro data_shaft.http_datasource_observer}
-  const HttpDatasourceObserver();
+  const new();
 
   /// Called when the underlying [RemoteDriver] throws an exception during
   /// the request execution (e.g., network timeout, DNS failure).
@@ -24,7 +24,7 @@ abstract interface class HttpDatasourceObserver
     Object? requestBody,
   });
 
-  /// Called when the server returns a status code defined in [inadmissibleStatusCode].
+  /// Called when the server returns a status code defined in [inadmissibleStatusCodes].
   /// Use this to log expected business errors (e.g., 404 Not Found).
   ///
   /// [inadmissibleStatusCodes] is the set of status codes that the [DatasourceRemote]

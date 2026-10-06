@@ -4,7 +4,7 @@ part of 'request_params.dart';
 ///
 /// Used for full resource replacement.
 base class PutParams extends RequestParams {
-  const PutParams({
+  const new({
     super.headers,
     super.encodeBody,
     super.urlParams,

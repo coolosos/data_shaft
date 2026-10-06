@@ -2,6 +2,14 @@ import 'dart:async';
 
 import 'package:cool_bedrock/cool_bedrock.dart'
     show Either, RepositoryError, Right;
+import 'package:data_shaft/data_shaft.dart'
+    show SafeRepositoryDatasourceCallable;
+import 'package:data_shaft/repository.dart'
+    show SafeRepositoryDatasourceCallable;
+import 'package:data_shaft/src/repository/repository.dart'
+    show SafeRepositoryDatasourceCallable;
+import 'package:data_shaft/src/repository/safe_repository_datasource_callable.dart'
+    show SafeRepositoryDatasourceCallable;
 
 import '../datasources/datasource_callable.dart';
 import '../observers/repository/repository_observer_instances.dart';
@@ -16,10 +24,13 @@ import 'repository_datasource.dart';
 /// **Note:** This class does NOT handle exceptions automatically.
 /// For automatic error handling, use [SafeRepositoryDatasourceCallable].
 /// {@endtemplate}
-abstract class RepositoryDataSourceCallable<ValueType,
-    DS extends DataSourceCallable<ValueType>> extends RepositoryDataSource<DS> {
+abstract class RepositoryDataSourceCallable<
+  ValueType,
+  DS extends DataSourceCallable<ValueType>
+>
+    extends RepositoryDataSource<DS> {
   /// {@macro data_shaft.repository_datasource_callable}
-  RepositoryDataSourceCallable({required super.dataSource});
+  new({required super.dataSource});
 
   RepositoryDataSourceCallableObserver get observer =>
       RepositoryObserverInstances.repositoryDatasourceCallableObserver;

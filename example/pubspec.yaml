@@ -8,7 +8,10 @@ environment:
 
 dependencies:
   meta: ^1.17.0
-  cool_bedrock: ^2.0.0
+  cool_bedrock:
+    git:
+      url: git@github.com:coolosos/cool_bedrock
+      ref: main
   data_shaft:
     path: ../
 

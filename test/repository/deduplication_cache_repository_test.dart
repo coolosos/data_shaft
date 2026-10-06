@@ -28,9 +28,7 @@ void main() {
   });
 
   group('DeduplicationCacheRepository Tests', () {
-    test(
-        'Should call DataSource only once when multiple simultaneous calls are made',
-        () async {
+    test('Should call DataSource only once when multiple simultaneous calls are made', () async {
       dataSource.delay = const Duration(milliseconds: 100);
       const params = UserParams(id: '1');
 
@@ -46,18 +44,20 @@ void main() {
       }
     });
 
-    test('Should return cached data if refreshDuration has not expired',
-        () async {
-      const params = UserParams(id: '1');
+    test(
+      'Should return cached data if refreshDuration has not expired',
+      () async {
+        const params = UserParams(id: '1');
 
-      await repository.call(repositoryParams: params);
-      expect(dataSource.callCount, 1);
+        await repository.call(repositoryParams: params);
+        expect(dataSource.callCount, 1);
 
-      final result = await repository.call(repositoryParams: params);
+        final result = await repository.call(repositoryParams: params);
 
-      expect(dataSource.callCount, 1);
-      expect(result.isRight(), true);
-    });
+        expect(dataSource.callCount, 1);
+        expect(result.isRight(), true);
+      },
+    );
 
     test('Should call DataSource again after cache expires', () async {
       const params = UserParams(id: '1');
@@ -65,7 +65,7 @@ void main() {
       await repository.call(repositoryParams: params);
       expect(dataSource.callCount, 1);
 
-      await Future.delayed(const Duration(seconds: 2, milliseconds: 100));
+      await Future<void>.delayed(const Duration(seconds: 2, milliseconds: 100));
 
       await repository.call(repositoryParams: params);
       expect(dataSource.callCount, 2);
@@ -73,9 +73,7 @@ void main() {
   });
 
   group('Safe Error Handling Tests', () {
-    test(
-        'Should return UnControlRepositoryError when DataSource throws UnControlDataSourceException',
-        () async {
+    test('Should return UnControlRepositoryError when DataSource throws UnControlDataSourceException', () async {
       dataSourceThrowMock.errorToThrow = const UnControlDataSourceException(
         message: 'Server Error',
         statusCode: 500,
@@ -92,9 +90,7 @@ void main() {
       );
     });
 
-    test(
-        'Should return InadmissibleRepositoryError when DataSource throws InadmissibleDataSourceException',
-        () async {
+    test('Should return InadmissibleRepositoryError when DataSource throws InadmissibleDataSourceException', () async {
       dataSourceThrowMock.errorToThrow = const InadmissibleDataSourceException(
         message: 'Not Found',
         body: 'Not Found',
@@ -112,9 +108,7 @@ void main() {
       );
     });
 
-    test(
-        'Should return OnExceptionRepositoryError for unexpected generic exceptions',
-        () async {
+    test('Should return OnExceptionRepositoryError for unexpected generic exceptions', () async {
       dataSourceThrowMock.errorToThrow = Exception('Unexpected logic error');
 
       final result = await repositoryThrow.call(
@@ -140,21 +134,23 @@ void main() {
       expect(dataSourceThrowMock.callCount, 2);
       expect(repositoryThrow.isCached(), true);
     });
-    test('Simultaneous calls should all receive the same error result',
-        () async {
-      dataSourceThrowMock
-        ..errorToThrow = const UnControlDataSourceException(message: 'Fail')
-        ..delay = const Duration(milliseconds: 50);
+    test(
+      'Simultaneous calls should all receive the same error result',
+      () async {
+        dataSourceThrowMock
+          ..errorToThrow = const UnControlDataSourceException(message: 'Fail')
+          ..delay = const Duration(milliseconds: 50);
 
-      final results = await Future.wait([
-        repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
-        repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
-      ]);
+        final results = await Future.wait([
+          repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
+          repositoryThrow.call(repositoryParams: const UserParams(id: '1')),
+        ]);
 
-      expect(results[0].isLeft(), true);
-      expect(results[1].isLeft(), true);
+        expect(results[0].isLeft(), true);
+        expect(results[1].isLeft(), true);
 
-      expect(results[0], results[1]);
-    });
+        expect(results[0], results[1]);
+      },
+    );
   });
 }

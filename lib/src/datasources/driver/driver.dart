@@ -10,5 +10,5 @@
 /// {@endtemplate}
 abstract class Driver {
   /// {@macro data_shaft.driver}
-  const Driver();
+  const new();
 }

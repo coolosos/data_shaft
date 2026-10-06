@@ -10,10 +10,11 @@ import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 /// It integrates the [DeleteCall] logic.
 /// {@endtemplate}
 abstract base class DatasourceDeleteRemote<
-        RemoteObject extends Codable<Object, RemoteObject>,
-        Driver extends RemoteDriver>
+  RemoteObject extends Codable<Object, RemoteObject>,
+  Driver extends RemoteDriver
+>
     extends DatasourceRemote<RemoteObject, Driver>
     with DeleteCall<RemoteObject, Driver> {
   /// {@macro data_shaft.datasource_delete_remote}
-  DatasourceDeleteRemote({required super.driver});
+  new({required super.driver});
 }

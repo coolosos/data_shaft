@@ -22,7 +22,7 @@ import 'base_repository.dart';
 /// {@endtemplate}
 abstract class RepositoryDataSource<DS extends DataSource> extends Repository {
   /// Creates a [RepositoryDataSource] with the provided [dataSource].
-  RepositoryDataSource({required this.dataSource});
+  new({required this.dataSource});
 
   /// The [DataSource] instance used by this repository to fetch or persist data.
   final DS dataSource;

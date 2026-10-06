@@ -4,7 +4,7 @@ part of 'request_params.dart';
 ///
 /// Used for partial updates.
 base class PatchParams extends RequestParams {
-  const PatchParams({
+  const new({
     super.headers,
     super.encodeBody,
     super.urlParams,

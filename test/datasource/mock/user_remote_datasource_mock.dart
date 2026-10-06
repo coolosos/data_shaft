@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:data_shaft/src/datasources/datasource_callable.dart';
 
 class User {

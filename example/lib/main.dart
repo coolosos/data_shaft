@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print Example main
 
 import 'package:data_shaft/data_shaft.dart';
 import 'package:data_shaft_example/data/datasource/get_user_detail_datasource.dart';
@@ -69,7 +69,7 @@ Future<void> main(List<String> args) async {
 
   await cacheRepository.call(repositoryParams: noParams);
 
-  await Future.delayed(const Duration(seconds: 1));
+  await Future<void>.delayed(const Duration(seconds: 1));
 
   await cacheRepository.call(repositoryParams: noParams);
 
@@ -79,7 +79,7 @@ Future<void> main(List<String> args) async {
   // Output expected: 1
 
   print('Waiting for cache expiration...');
-  await Future.delayed(const Duration(milliseconds: 1010));
+  await Future<void>.delayed(const Duration(milliseconds: 1010));
 
   await cacheRepository.call(repositoryParams: noParams);
 

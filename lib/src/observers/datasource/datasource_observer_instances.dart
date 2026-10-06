@@ -3,6 +3,8 @@ library;
 import 'dart:developer';
 
 import 'package:cool_bedrock/cool_bedrock.dart';
+import 'package:data_shaft/data_shaft.dart'
+    show DataSource, DatasourceRemote, RemoteDriver;
 
 part 'datasource_observer_implementation.dart';
 part 'simple_datasource_observer.dart';
@@ -30,8 +32,7 @@ class DatasourceObserverInstances {
   static HttpDatasourceObserver? _httpDatasourceObserver;
 
   /// When enabled, if no explicit [datasourceObserver] is set, the
-  /// [httpDatasourceObserver] is used as fallback for lifecycle events
-  /// ([onCreate], [onDispose]).
+  /// [httpDatasourceObserver] is used as fallback for lifecycle events.
   static bool useHigherObserver = false;
 
   /// Sets a custom observer for basic Data Source lifecycle events.

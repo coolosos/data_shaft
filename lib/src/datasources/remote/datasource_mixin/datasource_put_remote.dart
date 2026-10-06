@@ -10,10 +10,11 @@ import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 /// It utilizes the [PutCall] mixin to manage the request lifecycle.
 /// {@endtemplate}
 abstract base class DatasourcePutRemote<
-        RemoteObject extends Codable<Object, RemoteObject>,
-        Driver extends RemoteDriver>
+  RemoteObject extends Codable<Object, RemoteObject>,
+  Driver extends RemoteDriver
+>
     extends DatasourceRemote<RemoteObject, Driver>
     with PutCall<RemoteObject, Driver> {
   /// {@macro data_shaft.datasource_put_remote}
-  DatasourcePutRemote({required super.driver});
+  new({required super.driver});
 }

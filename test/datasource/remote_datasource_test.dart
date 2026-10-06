@@ -13,14 +13,17 @@ import 'mock/remote/test_post_datasource.dart';
 import 'mock/remote/test_put_datasource.dart';
 
 void main() {
-  final remoteDatasources = <String,
-      DatasourceRemote<MockModel, MockRemoteDriver> Function(MockRemoteDriver)>{
-    'Get': (d) => TestGetDataSource(driver: d),
-    'Post': (d) => TestPostDataSource(driver: d),
-    'Patch': (d) => TestPatchDataSource(driver: d),
-    'Put': (d) => TestPutDataSource(driver: d),
-    'Delete': (d) => TestDeleteDataSource(driver: d),
-  };
+  final remoteDatasources =
+      <
+        String,
+        DatasourceRemote<MockModel, MockRemoteDriver> Function(MockRemoteDriver)
+      >{
+        'Get': (d) => TestGetDataSource(driver: d),
+        'Post': (d) => TestPostDataSource(driver: d),
+        'Patch': (d) => TestPatchDataSource(driver: d),
+        'Put': (d) => TestPutDataSource(driver: d),
+        'Delete': (d) => TestDeleteDataSource(driver: d),
+      };
 
   for (final entry in remoteDatasources.entries) {
     late MockRemoteDriver driver;
@@ -32,29 +35,31 @@ void main() {
         dataSource = entry.value(driver);
       });
 
-      test('Should build URI correctly with pathPrefix and pathModification',
-          () {
-        final uri = dataSource.uri;
+      test(
+        'Should build URI correctly with pathPrefix and pathModification',
+        () {
+          final uri = dataSource.uri;
 
-        expect(uri.toString(), 'https://api.test.com/users/123');
-      });
-
-      test('Should merge query parameters from generateCallRequirement',
-          () async {
-        driver.simulatedResponse = RequestResponse(
-          statusCode: 200,
-          body: () => '{"name": "Test User"}',
-          originalResponse: null,
-        );
-
-        await dataSource.call(params: const NoParams());
-
-        expect(driver.lastUri.toString(), contains('version=1'));
-      });
+          expect(uri.toString(), 'https://api.test.com/users/123');
+        },
+      );
 
       test(
-          'Should throw InadmissibleDataSourceException on defined inadmissible code',
-          () async {
+        'Should merge query parameters from generateCallRequirement',
+        () async {
+          driver.simulatedResponse = RequestResponse(
+            statusCode: 200,
+            body: () => '{"name": "Test User"}',
+            originalResponse: null,
+          );
+
+          await dataSource.call(params: const NoParams());
+
+          expect(driver.lastUri.toString(), contains('version=1'));
+        },
+      );
+
+      test('Should throw InadmissibleDataSourceException on defined inadmissible code', () async {
         driver.simulatedResponse = RequestResponse(
           statusCode: 404,
           body: () => 'Not Found',
@@ -67,19 +72,21 @@ void main() {
         );
       });
 
-      test('Should throw UnControlDataSourceException on non-admissible code',
-          () async {
-        driver.simulatedResponse = RequestResponse(
-          statusCode: 500,
-          body: () => 'Internal Server Error',
-          originalResponse: null,
-        );
+      test(
+        'Should throw UnControlDataSourceException on non-admissible code',
+        () async {
+          driver.simulatedResponse = RequestResponse(
+            statusCode: 500,
+            body: () => 'Internal Server Error',
+            originalResponse: null,
+          );
 
-        expect(
-          () => dataSource.call(params: const NoParams()),
-          throwsA(isA<UnControlDataSourceException>()),
-        );
-      });
+          expect(
+            () => dataSource.call(params: const NoParams()),
+            throwsA(isA<UnControlDataSourceException>()),
+          );
+        },
+      );
 
       test('Should return transformed object on success (200)', () async {
         driver.simulatedResponse = RequestResponse(
@@ -150,23 +157,25 @@ void main() {
       expect(dataSource.uri.path, '/api/users');
     });
 
-    test('Should use default inadmissibleStatusCode when not overridden',
-        () async {
-      driver.simulatedResponse = RequestResponse(
-        statusCode: 200,
-        body: () => '{"name": "Test"}',
-        originalResponse: null,
-      );
+    test(
+      'Should use default inadmissibleStatusCode when not overridden',
+      () async {
+        driver.simulatedResponse = RequestResponse(
+          statusCode: 200,
+          body: () => '{"name": "Test"}',
+          originalResponse: null,
+        );
 
-      final dataSource = PathTestDataSource(
-        driver: driver,
-        customPath: '/users',
-        customPrefix: '',
-      );
+        final dataSource = PathTestDataSource(
+          driver: driver,
+          customPath: '/users',
+          customPrefix: '',
+        );
 
-      final result = await dataSource.call(params: const NoParams());
-      expect(result, isA<MockModel>());
-    });
+        final result = await dataSource.call(params: const NoParams());
+        expect(result, isA<MockModel>());
+      },
+    );
   });
 
   group('DatasourceRemote Body Coverage', () {
@@ -193,7 +202,7 @@ void main() {
 
 final class _BodyTestDataSource
     extends DatasourcePostRemote<MockModel, MockRemoteDriver> {
-  _BodyTestDataSource({required super.driver});
+  new({required super.driver});
 
   @override
   String get host => 'https://api.test.com';
@@ -209,7 +218,7 @@ final class _BodyTestDataSource
       PostParams(encodeBody: () => '{"key": "value"}');
 
   @override
-  MockModel transformation(
-          {required covariant RequestResponse remoteResponse}) =>
-      const MockModel(name: 'test');
+  MockModel transformation({
+    required covariant RequestResponse remoteResponse,
+  }) => const MockModel(name: 'test');
 }

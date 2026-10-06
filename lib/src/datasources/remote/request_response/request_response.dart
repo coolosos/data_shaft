@@ -1,3 +1,5 @@
+import 'package:data_shaft/data_shaft.dart' show DatasourceRemote, RemoteDriver;
+
 /// {@template data_shaft.request_response}
 /// A standardized response object returned by [RemoteDriver].
 ///
@@ -7,7 +9,7 @@
 /// {@endtemplate}
 class RequestResponse<OriginalResponse> {
   /// {@macro data_shaft.request_response}
-  const RequestResponse({
+  const new({
     required this.statusCode,
     required this.originalResponse,
     this.body,

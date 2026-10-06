@@ -3,6 +3,9 @@ library;
 import 'dart:developer';
 
 import 'package:cool_bedrock/cool_bedrock.dart';
+import 'package:data_shaft/data_shaft.dart'
+    show DataSourceStreamable, Repository;
+
 import 'package:meta/meta.dart';
 
 part 'repository_observer.dart';
@@ -29,9 +32,9 @@ part 'repository_observer_implementations.dart';
 class RepositoryObserverInstances {
   static RepositoryObserver? _repositoryObserver;
   static RepositoryDataSourceCallableObserver?
-      _repositoryDatasourceCallableObserver;
+  _repositoryDatasourceCallableObserver;
   static RepositoryDataSourceStreamableObserver?
-      _repositoryDataSourceStreamableObserver;
+  _repositoryDataSourceStreamableObserver;
   static SafeCallableRepositoryObserver? _safeCallableObserver;
 
   /// When enabled, if no explicit observer is set at a given level,
@@ -40,7 +43,7 @@ class RepositoryObserverInstances {
   /// serve as [repositoryDatasourceCallableObserver] and [repositoryObserver].
   static bool useHigherObserver = false;
 
-  /// Sets a custom observer for basic Repository lifecycle events ([onCreate], [onDispose]).
+  /// Sets a custom observer for basic Repository lifecycle events.
   static set repositoryObserver(RepositoryObserver observer) =>
       _repositoryObserver = observer;
 
@@ -57,30 +60,28 @@ class RepositoryObserverInstances {
   /// Sets a custom observer for one-shot repository calls (before/after DataSource).
   static set repositoryDatasourceCallableObserver(
     RepositoryDataSourceCallableObserver observer,
-  ) =>
-      _repositoryDatasourceCallableObserver = observer;
+  ) => _repositoryDatasourceCallableObserver = observer;
 
   /// Returns the current callable observer, or a default log implementation.
   ///
   /// If [useHigherObserver] is enabled and no explicit observer is set,
   /// falls back to [safeCallableObserver].
   static RepositoryDataSourceCallableObserver
-      get repositoryDatasourceCallableObserver =>
-          _repositoryDatasourceCallableObserver ??
-          (useHigherObserver ? _safeCallableObserver : null) ??
-          _DefaultRepositoryImp();
+  get repositoryDatasourceCallableObserver =>
+      _repositoryDatasourceCallableObserver ??
+      (useHigherObserver ? _safeCallableObserver : null) ??
+      _DefaultRepositoryImp();
 
   /// Sets a custom observer for stream-based repositories.
   static set repositoryDataSourceStreamableObserver(
     RepositoryDataSourceStreamableObserver observer,
-  ) =>
-      _repositoryDataSourceStreamableObserver = observer;
+  ) => _repositoryDataSourceStreamableObserver = observer;
 
   /// Returns the current streamable observer, or a default log implementation.
   static RepositoryDataSourceStreamableObserver
-      get repositoryDataSourceStreamableObserver =>
-          _repositoryDataSourceStreamableObserver ??
-          _DefaultRepositoryDataSourceStreamableObserverImpl();
+  get repositoryDataSourceStreamableObserver =>
+      _repositoryDataSourceStreamableObserver ??
+      _DefaultRepositoryDataSourceStreamableObserverImpl();
 
   /// Sets a custom observer that captures exceptions during safe calls.
   static set safeCallableObserver(SafeCallableRepositoryObserver observer) =>

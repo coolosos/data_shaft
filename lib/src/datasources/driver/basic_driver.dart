@@ -13,7 +13,7 @@ import 'driver.dart';
 /// {@endtemplate}
 abstract interface class BasicDriver<T> extends Driver {
   /// {@macro data_shaft.basic_driver}
-  const BasicDriver();
+  const new();
 
   /// Checks if a value associated with the given [key] exists in the storage.
   ///

@@ -3,7 +3,7 @@ import 'package:data_shaft/src/datasources/datasource_local.dart';
 import 'local_driver_mock.dart';
 
 class UserLocalDataSource extends DatasourceLocal<String, MockLocalDriver> {
-  UserLocalDataSource(super.driver);
+  new(super.driver);
 
   @override
   String get key => 'user_token_key';

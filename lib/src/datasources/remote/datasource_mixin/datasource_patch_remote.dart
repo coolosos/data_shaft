@@ -10,10 +10,11 @@ import 'package:data_shaft/src/datasources/remote/datasource_remote.dart';
 /// It leverages the [PatchCall] mixin, requiring [PatchParams] to be generated.
 /// {@endtemplate}
 abstract base class DatasourcePatchRemote<
-        RemoteObject extends Codable<Object, RemoteObject>,
-        Driver extends RemoteDriver>
+  RemoteObject extends Codable<Object, RemoteObject>,
+  Driver extends RemoteDriver
+>
     extends DatasourceRemote<RemoteObject, Driver>
     with PatchCall<RemoteObject, Driver> {
   /// {@macro data_shaft.datasource_patch_remote}
-  DatasourcePatchRemote({required super.driver});
+  new({required super.driver});
 }

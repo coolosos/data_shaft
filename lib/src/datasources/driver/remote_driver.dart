@@ -1,5 +1,9 @@
 import 'dart:convert';
 
+import 'package:data_shaft/data_shaft.dart' show DatasourceRemote;
+import 'package:data_shaft/datasource.dart' show DatasourceRemote;
+import 'package:data_shaft/src/datasources/remote/datasource_remote.dart'
+    show DatasourceRemote;
 import 'package:data_shaft/src/datasources/remote/request_response/request_response.dart';
 
 import 'driver.dart';
@@ -13,7 +17,7 @@ import 'driver.dart';
 /// {@endtemplate}
 abstract interface class RemoteDriver<OriginalResponse> extends Driver {
   /// {@macro data_shaft.remote_driver}
-  const RemoteDriver();
+  const new();
 
   /// Sends an HTTP HEAD request.
   ///

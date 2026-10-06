@@ -1,4 +1,5 @@
 import 'package:cool_bedrock/cool_bedrock.dart' show DataSourceException;
+import 'package:data_shaft/data_shaft.dart' show DataSource, Driver;
 
 /// {@template data_shaft.uncontrol_exception}
 /// Exception thrown when an **unexpected error** occurs within the [DataSource]
@@ -14,7 +15,7 @@ import 'package:cool_bedrock/cool_bedrock.dart' show DataSourceException;
 /// {@endtemplate}
 final class UnControlDataSourceException extends DataSourceException {
   /// {@macro data_shaft.uncontrol_exception}
-  const UnControlDataSourceException({
+  const new({
     this.body,
     this.statusCode,
     this.reasonPhrase,

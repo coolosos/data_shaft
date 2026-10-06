@@ -16,7 +16,7 @@ import 'driver/driver.dart';
 /// {@endtemplate}
 abstract class DatasourceLocal<ValueType, D extends Driver> extends DataSource {
   /// {@macro data_shaft.datasource_local}
-  DatasourceLocal(this.driver);
+  new(this.driver);
 
   /// The underlying [Driver] responsible for handling the low-level storage
   /// operations (e.g., reading/writing to Shared Preferences or Hive).

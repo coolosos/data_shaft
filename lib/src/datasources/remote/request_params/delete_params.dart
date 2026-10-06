@@ -5,7 +5,7 @@ part of 'request_params.dart';
 /// Although uncommon, it supports [encodeBody] for APIs that require
 /// a payload during deletion.
 base class DeleteParams extends RequestParams {
-  const DeleteParams({
+  const new({
     super.headers,
     super.urlParams,
     super.encodeBody,

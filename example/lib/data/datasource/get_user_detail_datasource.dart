@@ -41,8 +41,9 @@ final class GetUserDetailDatasource
   }
 
   @override
-  RemoteUser transformation(
-      {required covariant RequestResponse remoteResponse}) {
+  RemoteUser transformation({
+    required covariant RequestResponse<Object?> remoteResponse,
+  }) {
     return RemoteUser.fromJson(remoteResponse.body?.call() ?? '');
   }
 }
