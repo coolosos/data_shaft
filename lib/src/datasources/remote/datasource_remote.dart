@@ -46,11 +46,14 @@ abstract class DatasourceRemote<
   ///host of the provide information, can contains port and scheme
   String get host;
 
-  ///path of the provide information
+  ///`path` joined with `pathPrefix`, if any.
   String? get path;
   String? get pathPrefix => null;
 
-  ///path of the provide information
+  ///Replacement pairs applied to the request path.
+  ///
+  ///Every occurrence of each key is replaced by its value before the
+  ///request is sent (e.g. `{'{id}': '42'}`).
   Map<String, String> get pathModification => {};
 
   ///Set of http status codes that are considered admissible.
@@ -109,7 +112,7 @@ abstract class DatasourceRemote<
 
     var modifyPath = _buildPath();
     pathModification.forEach(
-      (key, value) => modifyPath = modifyPath.replaceFirst(key, value),
+      (key, value) => modifyPath = modifyPath.replaceAll(key, value),
     );
 
     final completeUri = Uri(
@@ -147,8 +150,8 @@ abstract class DatasourceRemote<
     required Uri? requestUri,
     Object? requestBody,
   }) {
-    final responseBody = requestResponse.body?.call() ?? '';
     if (inadmissibleStatusCode.contains(requestResponse.statusCode)) {
+      final responseBody = requestResponse.body?.call() ?? '';
       observer.onInadmissibleException(
         requestResponse.statusCode,
         responseBody,
@@ -169,6 +172,7 @@ abstract class DatasourceRemote<
       );
     }
     if (!admissibleStatusCode.contains(requestResponse.statusCode)) {
+      final responseBody = requestResponse.body?.call() ?? '';
       observer.onUnControlException(
         requestResponse.statusCode,
         responseBody,
@@ -220,22 +224,39 @@ abstract class DatasourceRemote<
           callUri,
           headers: requestParams.headers,
           body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
         ),
         PutParams() => driver.put(
           callUri,
           headers: requestParams.headers,
           body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
         ),
-        GetParams() => driver.get(callUri, headers: requestParams.headers),
+        GetParams() => driver.get(
+          callUri,
+          headers: requestParams.headers,
+          options: requestParams.driverOptions,
+        ),
+        HeadParams() => driver.head(
+          callUri,
+          headers: requestParams.headers,
+          options: requestParams.driverOptions,
+        ),
         PatchParams() => driver.patch(
           callUri,
           headers: requestParams.headers,
           body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
         ),
         PostParams() => driver.post(
           callUri,
           headers: requestParams.headers,
           body: body,
+          encoding: requestParams.encoding,
+          options: requestParams.driverOptions,
         ),
       };
     } catch (error, stackTrace) {
@@ -260,7 +281,6 @@ abstract class DatasourceRemote<
   ///Manage the server connection.
   ///
   ///Usually use with [checkInformation] function for control server answer.
-  // Future<Info> call({required covariant Params params});
   @override
   Future<RemoteObject> call({required covariant Params params}) {
     return request(generateCallRequirement(params: params));

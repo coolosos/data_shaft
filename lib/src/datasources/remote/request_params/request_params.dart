@@ -2,6 +2,7 @@ import 'dart:convert' show Encoding, utf8;
 
 part 'delete_params.dart';
 part 'get_params.dart';
+part 'head_params.dart';
 part 'patch_params.dart';
 part 'post_params.dart';
 part 'put_params.dart';

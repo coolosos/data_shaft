@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cool_bedrock/cool_bedrock.dart';
 import 'package:data_shaft/datasource.dart';
 import 'package:data_shaft/src/issues/datasource_exception/inadmissible_data_source_exception.dart';
@@ -8,6 +10,7 @@ import 'mock/mock_driver.dart';
 import 'mock/path_test_datasource_mock.dart';
 import 'mock/remote/test_delete_datasource.dart';
 import 'mock/remote/test_get_datasource.dart';
+import 'mock/remote/test_head_datasource.dart';
 import 'mock/remote/test_patch_datasource.dart';
 import 'mock/remote/test_post_datasource.dart';
 import 'mock/remote/test_put_datasource.dart';
@@ -19,6 +22,7 @@ void main() {
         DatasourceRemote<MockModel, MockRemoteDriver> Function(MockRemoteDriver)
       >{
         'Get': (d) => TestGetDataSource(driver: d),
+        'Head': (d) => TestHeadDataSource(driver: d),
         'Post': (d) => TestPostDataSource(driver: d),
         'Patch': (d) => TestPatchDataSource(driver: d),
         'Put': (d) => TestPutDataSource(driver: d),
@@ -158,6 +162,17 @@ void main() {
     });
 
     test(
+      'Should replace every occurrence of a repeated token in pathModification',
+      () {
+        final dataSource = _RepeatedTokenDataSource(driver: driver);
+
+        final uri = dataSource.uri;
+
+        expect(uri.path, '/users/42/posts/42');
+      },
+    );
+
+    test(
       'Should use default inadmissibleStatusCode when not overridden',
       () async {
         driver.simulatedResponse = RequestResponse(
@@ -191,6 +206,10 @@ void main() {
 
       await dataSource.call(params: const NoParams());
 
+      expect(driver.lastBody, '{"key": "value"}');
+      expect(driver.lastEncoding, utf8);
+      expect(driver.lastOptions, <String, Object?>{'dioCancel': true});
+
       driver.throwable = UnimplementedError();
       expect(
         () => dataSource.call(params: const NoParams()),
@@ -198,6 +217,66 @@ void main() {
       );
     });
   });
+
+  group('DatasourceRemote Options/Encoding Coverage', () {
+    late MockRemoteDriver driver;
+
+    setUp(() => driver = MockRemoteDriver());
+
+    test('Should forward driverOptions to the driver on GET', () async {
+      driver.simulatedResponse = RequestResponse(
+        statusCode: 200,
+        body: () => '{"name": "Test"}',
+        originalResponse: null,
+      );
+
+      final dataSource = TestGetDataSource(driver: driver);
+
+      await dataSource.call(params: const NoParams());
+
+      expect(driver.lastOptions, <String, Object?>{'source': 'test_get'});
+    });
+
+    test('Should forward driverOptions to the driver on HEAD', () async {
+      driver.simulatedResponse = RequestResponse(
+        statusCode: 200,
+        body: () => '{"name": "Test"}',
+        originalResponse: null,
+      );
+
+      final dataSource = TestHeadDataSource(driver: driver);
+
+      await dataSource.call(params: const NoParams());
+
+      expect(driver.lastOptions, <String, Object?>{'source': 'test_head'});
+    });
+  });
+}
+
+final class _RepeatedTokenDataSource
+    extends DatasourceGetRemote<MockModel, MockRemoteDriver> {
+  new({required super.driver});
+
+  @override
+  String get host => 'https://test.com';
+
+  @override
+  String get path => '/users/:id/posts/:id';
+
+  @override
+  Map<String, String> get pathModification => {':id': '42'};
+
+  @override
+  Set<int> get admissibleStatusCode => {200};
+
+  @override
+  MockModel transformation({
+    required covariant RequestResponse<Object?> remoteResponse,
+  }) => const MockModel(name: '');
+
+  @override
+  GetParams generateCallRequirement({required Params params}) =>
+      const GetParams();
 }
 
 final class _BodyTestDataSource
@@ -214,8 +293,11 @@ final class _BodyTestDataSource
   Set<int> get admissibleStatusCode => {200};
 
   @override
-  PostParams generateCallRequirement({required Params params}) =>
-      PostParams(encodeBody: () => '{"key": "value"}');
+  PostParams generateCallRequirement({required Params params}) => PostParams(
+    encodeBody: () => '{"key": "value"}',
+    encoding: utf8,
+    driverOptions: <String, Object?>{'dioCancel': true},
+  );
 
   @override
   MockModel transformation({

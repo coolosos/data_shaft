@@ -39,6 +39,8 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
   Uri? lastUri;
   Object? lastBody;
   Map<String, String>? lastHeaders;
+  Encoding? lastEncoding;
+  Object? lastOptions;
 
   @override
   Future<RequestResponse<Object?>> get(
@@ -48,6 +50,7 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
   }) async {
     lastUri = uri;
     lastHeaders = headers;
+    lastOptions = options;
     if (throwable case final throwable?) {
       throw throwable;
     }
@@ -65,6 +68,8 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     lastUri = uri;
     lastBody = body;
     lastHeaders = headers;
+    lastEncoding = encoding;
+    lastOptions = options;
     if (throwable case final throwable?) {
       throw throwable;
     }
@@ -78,7 +83,13 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) => post(uri, body: body, headers: headers);
+  }) => post(
+    uri,
+    body: body,
+    headers: headers,
+    encoding: encoding,
+    options: options,
+  );
   @override
   Future<RequestResponse<Object?>> patch(
     Uri uri, {
@@ -86,7 +97,13 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) => post(uri, body: body, headers: headers);
+  }) => post(
+    uri,
+    body: body,
+    headers: headers,
+    encoding: encoding,
+    options: options,
+  );
   @override
   Future<RequestResponse<Object?>> put(
     Uri uri, {
@@ -94,12 +111,18 @@ class MockRemoteDriver implements RemoteDriver<Object?> {
     Object? body,
     Encoding? encoding,
     Object? options,
-  }) => post(uri, body: body, headers: headers);
+  }) => post(
+    uri,
+    body: body,
+    headers: headers,
+    encoding: encoding,
+    options: options,
+  );
 
   @override
   Future<RequestResponse<Object?>> head(
     Uri url, {
     Map<String, String>? headers,
     Object? options,
-  }) => post(url, body: null, headers: headers);
+  }) => post(url, body: null, headers: headers, options: options);
 }
