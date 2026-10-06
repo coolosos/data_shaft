@@ -7,14 +7,16 @@ on:
       - ready_for_review
       - synchronize
       - opened
-
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   spellcheck:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: streetsidesoftware/cspell-action@v8.4.0
+      - uses: actions/checkout@v7
+      - uses: streetsidesoftware/cspell-action@v9.1.0
   validate:
     name: Analyse
     if: ${{ !github.event.pull_request.draft }}
@@ -22,9 +24,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Set up Dart SDK
-        uses: dart-lang/setup-dart@v1.7.2
+        uses: dart-lang/setup-dart@v1.8.1
       - name: Install dependencies
         run: dart pub get
       - name: Analyze project
