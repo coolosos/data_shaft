@@ -2,18 +2,11 @@ import 'dart:async';
 
 import 'package:cool_bedrock/cool_bedrock.dart'
     show Either, RepositoryError, Right;
-import 'package:data_shaft/data_shaft.dart'
-    show SafeRepositoryDatasourceCallable;
-import 'package:data_shaft/repository.dart'
-    show SafeRepositoryDatasourceCallable;
-import 'package:data_shaft/src/repository/repository.dart'
-    show SafeRepositoryDatasourceCallable;
-import 'package:data_shaft/src/repository/safe_repository_datasource_callable.dart'
-    show SafeRepositoryDatasourceCallable;
 
 import '../datasources/datasource_callable.dart';
 import '../observers/repository/repository_observer_instances.dart';
 import 'repository_datasource.dart';
+import 'safe_repository_datasource_callable.dart';
 
 /// {@template data_shaft.repository_datasource_callable}
 /// A Repository implementation that wraps a specific [DataSourceCallable].
@@ -49,18 +42,32 @@ abstract class RepositoryDataSourceCallable<
       startTime: startTime,
     );
 
-    final data = await dataSource.call(params: repositoryParams);
+    try {
+      final data = await dataSource.call(params: repositoryParams);
 
-    final endTime = DateTime.now();
-    final elapsed = endTime.difference(startTime);
+      final endTime = DateTime.now();
+      final elapsed = endTime.difference(startTime);
 
-    observer.afterCall(
-      runtimeType.toString(),
-      dataSource.runtimeType.toString(),
-      data,
-      endTime: endTime,
-      elapsed: elapsed,
-    );
-    return Right(data);
+      observer.afterCall(
+        runtimeType.toString(),
+        dataSource.runtimeType.toString(),
+        data,
+        endTime: endTime,
+        elapsed: elapsed,
+      );
+      return Right(data);
+    } catch (error, stackTrace) {
+      final endTime = DateTime.now();
+      final elapsed = endTime.difference(startTime);
+      RepositoryObserverInstances.callErrorObserver.onCallError(
+        runtimeType.toString(),
+        dataSource.runtimeType.toString(),
+        error,
+        stackTrace,
+        endTime: endTime,
+        elapsed: elapsed,
+      );
+      rethrow;
+    }
   }
 }

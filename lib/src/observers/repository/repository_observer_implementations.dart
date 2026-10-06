@@ -40,6 +40,25 @@ class _DefaultRepositoryImp implements RepositoryDataSourceCallableObserver {
   }
 }
 
+class _DefaultCallErrorObserver implements RepositoryCallErrorObserver {
+  @override
+  void onCallError(
+    String repositoryName,
+    String datasourceName,
+    Object exception,
+    StackTrace stackTrace, {
+    required DateTime endTime,
+    required Duration elapsed,
+  }) {
+    log(
+      '❌ DataSource call failed: $datasourceName | Elapsed: ${elapsed.inMilliseconds}ms',
+      name: _repoTag(repositoryName),
+      error: exception,
+      stackTrace: stackTrace,
+    );
+  }
+}
+
 @reopen
 class _DefaultSafeRepository extends SafeCallableRepositoryObserver {
   @override

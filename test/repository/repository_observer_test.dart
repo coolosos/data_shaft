@@ -72,6 +72,28 @@ class TestSafeObserver implements SafeCallableRepositoryObserver {
   }
 }
 
+class RecordingCallErrorObserver implements RepositoryCallErrorObserver {
+  int callCount = 0;
+  Object? lastException;
+  StackTrace? lastStackTrace;
+  Duration? lastElapsed;
+
+  @override
+  void onCallError(
+    String repositoryName,
+    String datasourceName,
+    Object exception,
+    StackTrace stackTrace, {
+    required DateTime endTime,
+    required Duration elapsed,
+  }) {
+    callCount++;
+    lastException = exception;
+    lastStackTrace = stackTrace;
+    lastElapsed = elapsed;
+  }
+}
+
 void main() {
   tearDown(RepositoryObserverInstances.reset);
 
@@ -119,6 +141,44 @@ void main() {
     test('Should notify onDispose when repository is disposed', () {
       repository.dispose();
       expect(observer.onDisposeCalled, true);
+    });
+  });
+
+  group('callErrorObserver', () {
+    test('should notify onCallError when the datasource call throws', () async {
+      final errorObserver = RecordingCallErrorObserver();
+      RepositoryObserverInstances.callErrorObserver = errorObserver;
+
+      final datasource = UserDataSourceThrowMock()
+        ..errorToThrow = Exception('Boom');
+      final repository = UserRepositoryThrowMock(
+        dataSource: datasource,
+        refreshDuration: const Duration(seconds: 1),
+      );
+
+      final result = await repository.call(
+        repositoryParams: const UserParams(id: '1'),
+      );
+
+      expect(result.isLeft(), true);
+      expect(errorObserver.callCount, 1);
+      expect(errorObserver.lastException, isA<Exception>());
+      expect(errorObserver.lastStackTrace, isNotNull);
+      expect(errorObserver.lastElapsed, isNotNull);
+    });
+
+    test('should NOT notify onCallError on a successful call', () async {
+      final errorObserver = RecordingCallErrorObserver();
+      RepositoryObserverInstances.callErrorObserver = errorObserver;
+
+      final repository = UserRepositoryMock(
+        dataSource: UserDataSourceMock(),
+        refreshDuration: const Duration(seconds: 1),
+      );
+
+      await repository.call(repositoryParams: const UserParams(id: '1'));
+
+      expect(errorObserver.callCount, 0);
     });
   });
 

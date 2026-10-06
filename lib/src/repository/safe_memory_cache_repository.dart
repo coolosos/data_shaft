@@ -42,14 +42,18 @@ abstract class SafeMemoryCacheRepository<
     // 2. Call Remote (Safe execution)
     final data = await super.call(repositoryParams: repositoryParams);
 
-    // 3. Update Cache
-    cache = refreshCache(datasourceResponse: data);
+    // 3. Update Cache (only on success: a failed call must not discard the
+    //    last good value; [refreshCache] is invoked with a [Right] response).
+    if (data is Right<RepositoryError, Info>) {
+      cache = refreshCache(datasourceResponse: data);
+    }
     return data;
   }
 
   /// Extracts the data from the response to update the cache.
   ///
-  /// By default, it returns the data if the response is [Right], or null if [Left].
+  /// Only invoked when the datasource call succeeded (the response is [Right]).
+  /// Return `null` to skip caching for this result.
   /// Override this if you need custom logic for when to update the cache.
   Info? refreshCache({
     required Either<RepositoryError, Info> datasourceResponse,

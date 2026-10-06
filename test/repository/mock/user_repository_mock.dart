@@ -18,3 +18,8 @@ class UserRepositoryFlowMock
     extends DeduplicationCacheRepository<MockModel, TestGetDataSource> {
   new({required super.dataSource, required super.refreshDuration});
 }
+
+class UserDedupRepository
+    extends DeduplicationRepository<User, UserDataSourceMock> {
+  new({required super.dataSource});
+}

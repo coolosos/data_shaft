@@ -3,6 +3,8 @@ import 'package:data_shaft/src/issues/datasource_exception/un_control_data_sourc
 import 'package:data_shaft/src/issues/repository_error/inadmissible_repository_error.dart';
 import 'package:data_shaft/src/issues/repository_error/on_exception_repository_error.dart';
 import 'package:data_shaft/src/issues/repository_error/un_control_repository_error.dart';
+import 'package:data_shaft/src/repository/helpers/deduplication_repository_helper.dart';
+import 'package:data_shaft/src/repository/repository_datasource_callable.dart';
 import 'package:test/test.dart';
 
 import '../datasource/mock/user_remote_datasource_mock.dart';
@@ -70,6 +72,40 @@ void main() {
       await repository.call(repositoryParams: params);
       expect(dataSource.callCount, 2);
     });
+
+    test('Should clear the cache forcing a new DataSource call', () async {
+      const params = UserParams(id: '1');
+
+      await repository.call(repositoryParams: params);
+      expect(repository.isCached(), true);
+
+      repository.clear();
+      expect(repository.isCached(), false);
+
+      await repository.call(repositoryParams: params);
+      expect(dataSource.callCount, 2);
+    });
+  });
+
+  group('DeduplicationRepository Tests', () {
+    test(
+      'Should deduplicate simultaneous calls in a safe repository',
+      () async {
+        final dataSource = UserDataSourceMock()
+          ..delay = const Duration(milliseconds: 100);
+        final repository = UserDedupRepository(dataSource: dataSource);
+
+        final results = await Future.wait([
+          repository.call(repositoryParams: const UserParams(id: '1')),
+          repository.call(repositoryParams: const UserParams(id: '1')),
+        ]);
+
+        expect(dataSource.callCount, 1);
+        for (final result in results) {
+          expect(result.isRight(), true);
+        }
+      },
+    );
   });
 
   group('Safe Error Handling Tests', () {
@@ -84,10 +120,12 @@ void main() {
       );
 
       expect(result.isLeft(), true);
-      result.fold(
-        (error) => expect(error, isA<UnControlRepositoryError>()),
-        (_) => fail('Should have been a Left'),
-      );
+      result.fold((error) {
+        expect(error, isA<UnControlRepositoryError>());
+        final uncontrol = error as UnControlRepositoryError;
+        expect(uncontrol.cause, isA<UnControlDataSourceException>());
+        expect(uncontrol.stackTrace, isNotNull);
+      }, (_) => fail('Should have been a Left'));
     });
 
     test('Should return InadmissibleRepositoryError when DataSource throws InadmissibleDataSourceException', () async {
@@ -102,10 +140,12 @@ void main() {
       );
 
       expect(result.isLeft(), true);
-      result.fold(
-        (error) => expect(error, isA<InadmissibleRepositoryError>()),
-        (_) => fail('Should have been a Left'),
-      );
+      result.fold((error) {
+        expect(error, isA<InadmissibleRepositoryError>());
+        final inadmissible = error as InadmissibleRepositoryError;
+        expect(inadmissible.statusCode, 404);
+        expect(inadmissible.body, 'Not Found');
+      }, (_) => fail('Should have been a Left'));
     });
 
     test('Should return OnExceptionRepositoryError for unexpected generic exceptions', () async {
@@ -134,6 +174,75 @@ void main() {
       expect(dataSourceThrowMock.callCount, 2);
       expect(repositoryThrow.isCached(), true);
     });
+
+    test('Should keep the last valid cache when a later call fails', () async {
+      dataSourceThrowMock.errorToThrow = null;
+      const params = UserParams(id: '1');
+
+      await repositoryThrow.call(repositoryParams: params);
+      expect(dataSourceThrowMock.callCount, 1);
+      expect(repositoryThrow.isCached(), true);
+
+      await Future<void>.delayed(const Duration(seconds: 2, milliseconds: 100));
+
+      dataSourceThrowMock.errorToThrow = Exception('Network down');
+      final failedCall = await repositoryThrow.call(repositoryParams: params);
+
+      expect(failedCall.isLeft(), true);
+      expect(dataSourceThrowMock.callCount, 2);
+      expect(
+        repositoryThrow.isCached(),
+        true,
+        reason: 'a failed call must not discard the last valid cache',
+      );
+      expect(
+        repositoryThrow.cache?.name,
+        'User 1',
+        reason: 'the last valid value survives a failed refresh',
+      );
+
+      dataSourceThrowMock.errorToThrow = null;
+      final served = await repositoryThrow.call(repositoryParams: params);
+
+      expect(served.isRight(), true);
+      expect(repositoryThrow.isCached(), true);
+      expect(repositoryThrow.cache?.name, 'User 1');
+    });
+
+    test(
+      'Dedup key is released when the datasource call throws (no deadlock)',
+      () async {
+        final datasource = UserDataSourceThrowMock()
+          ..errorToThrow = Exception('boom')
+          ..delay = const Duration(milliseconds: 10);
+        final repository = _ThrowingDedupRepository(dataSource: datasource);
+
+        await expectLater(
+          Future.wait([
+            repository.call(repositoryParams: const UserParams(id: '1')),
+            repository.call(repositoryParams: const UserParams(id: '1')),
+          ]),
+          throwsException,
+        );
+        expect(datasource.callCount, 1);
+
+        datasource.errorToThrow = null;
+        final retry = await repository.call(
+          repositoryParams: const UserParams(id: '1'),
+        );
+        final retryUser = retry.fold(
+          (_) => fail('Expected a Right result'),
+          (user) => user,
+        );
+
+        expect(retryUser.name, 'User 1');
+        expect(
+          datasource.callCount,
+          2,
+          reason: 'after a failure the same params must start a new call',
+        );
+      },
+    );
     test(
       'Simultaneous calls should all receive the same error result',
       () async {
@@ -153,4 +262,12 @@ void main() {
       },
     );
   });
+}
+
+/// Non-safe repository: the datasource error propagates as a thrown exception
+/// (no safety net), which exercises the deduplication deadlock regression.
+class _ThrowingDedupRepository
+    extends RepositoryDataSourceCallable<User, UserDataSourceThrowMock>
+    with DeduplicationManagement<User, UserDataSourceThrowMock> {
+  new({required super.dataSource});
 }

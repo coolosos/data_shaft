@@ -41,6 +41,34 @@ abstract interface class RepositoryDataSourceCallableObserver
   });
 }
 
+/// {@template data_shaft.repository_call_error_observer}
+/// Observer for failures raised by the DataSource while a one-shot repository
+/// call is in progress.
+///
+/// It is intentionally a separate slot from [RepositoryDataSourceCallableObserver]
+/// so existing observer implementations keep compiling: implement or assign this
+/// slot only when you need to observe thrown errors with timing information.
+///
+/// It is only invoked when the underlying call **throws**; error responses
+/// returned as [Either.left] values go through `afterCall` as usual.
+/// {@endtemplate}
+abstract interface class RepositoryCallErrorObserver {
+  const new();
+
+  /// Called when the underlying DataSource call throws.
+  ///
+  /// [endTime] is the timestamp captured right after the failure.
+  /// [elapsed] is the duration computed from startTime to [endTime].
+  void onCallError(
+    String repositoryName,
+    String datasourceName,
+    Object exception,
+    StackTrace stackTrace, {
+    required DateTime endTime,
+    required Duration elapsed,
+  });
+}
+
 /// {@template data_shaft.safe_callable_repository_observer}
 /// A specialized observer that captures exceptions during "Safe" calls.
 ///

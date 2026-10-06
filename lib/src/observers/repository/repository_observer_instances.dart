@@ -36,6 +36,16 @@ class RepositoryObserverInstances {
   static RepositoryDataSourceStreamableObserver?
   _repositoryDataSourceStreamableObserver;
   static SafeCallableRepositoryObserver? _safeCallableObserver;
+  static RepositoryCallErrorObserver? _callErrorObserver;
+
+  static final RepositoryDataSourceCallableObserver _defaultCallable =
+      _DefaultRepositoryImp();
+  static final RepositoryDataSourceStreamableObserver _defaultStreamable =
+      _DefaultRepositoryDataSourceStreamableObserverImpl();
+  static final SafeCallableRepositoryObserver _defaultSafe =
+      _DefaultSafeRepository();
+  static final RepositoryCallErrorObserver _defaultCallError =
+      _DefaultCallErrorObserver();
 
   /// When enabled, if no explicit observer is set at a given level,
   /// the next more specific observer is used as fallback.
@@ -55,7 +65,7 @@ class RepositoryObserverInstances {
       _repositoryObserver ??
       (useHigherObserver ? _repositoryDatasourceCallableObserver : null) ??
       (useHigherObserver ? _safeCallableObserver : null) ??
-      _DefaultRepositoryImp();
+      _defaultCallable;
 
   /// Sets a custom observer for one-shot repository calls (before/after DataSource).
   static set repositoryDatasourceCallableObserver(
@@ -70,7 +80,7 @@ class RepositoryObserverInstances {
   get repositoryDatasourceCallableObserver =>
       _repositoryDatasourceCallableObserver ??
       (useHigherObserver ? _safeCallableObserver : null) ??
-      _DefaultRepositoryImp();
+      _defaultCallable;
 
   /// Sets a custom observer for stream-based repositories.
   static set repositoryDataSourceStreamableObserver(
@@ -80,8 +90,7 @@ class RepositoryObserverInstances {
   /// Returns the current streamable observer, or a default log implementation.
   static RepositoryDataSourceStreamableObserver
   get repositoryDataSourceStreamableObserver =>
-      _repositoryDataSourceStreamableObserver ??
-      _DefaultRepositoryDataSourceStreamableObserverImpl();
+      _repositoryDataSourceStreamableObserver ?? _defaultStreamable;
 
   /// Sets a custom observer that captures exceptions during safe calls.
   static set safeCallableObserver(SafeCallableRepositoryObserver observer) =>
@@ -89,7 +98,15 @@ class RepositoryObserverInstances {
 
   /// Returns the current safe callable observer, or a default log implementation.
   static SafeCallableRepositoryObserver get safeCallableObserver =>
-      _safeCallableObserver ?? _DefaultSafeRepository();
+      _safeCallableObserver ?? _defaultSafe;
+
+  /// Sets a custom observer for DataSource call failures (thrown errors).
+  static set callErrorObserver(RepositoryCallErrorObserver observer) =>
+      _callErrorObserver = observer;
+
+  /// Returns the current call error observer, or a default log implementation.
+  static RepositoryCallErrorObserver get callErrorObserver =>
+      _callErrorObserver ?? _defaultCallError;
 
   /// Resets all observers and flags to their default state.
   /// Useful for testing isolation.
@@ -98,6 +115,7 @@ class RepositoryObserverInstances {
     _repositoryDatasourceCallableObserver = null;
     _repositoryDataSourceStreamableObserver = null;
     _safeCallableObserver = null;
+    _callErrorObserver = null;
     useHigherObserver = false;
   }
 }

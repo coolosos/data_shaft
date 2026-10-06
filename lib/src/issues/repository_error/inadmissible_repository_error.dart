@@ -11,8 +11,18 @@ import 'package:data_shaft/data_shaft.dart'
 /// {@endtemplate}
 base class InadmissibleRepositoryError extends RepositoryError {
   /// {@macro data_shaft.inadmissible_repository_error}
-  const new({super.message = 'Inadmissible result from Data Source'});
+  const new({
+    super.message = 'Inadmissible result from Data Source',
+    this.statusCode,
+    this.body,
+  });
+
+  /// The status code returned by the source (e.g., 404, 400), when available.
+  final int? statusCode;
+
+  /// The response body (payload) returned by the source, when available.
+  final Object? body;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, statusCode, body];
 }

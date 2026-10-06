@@ -72,7 +72,7 @@ abstract class SafeRepositoryDatasourceCallable<
       stackTrace,
       runtimeType.toString(),
     );
-    return const UnControlRepositoryError();
+    return UnControlRepositoryError(cause: exception, stackTrace: stackTrace);
   };
 
   /// Default handler for inadmissible exceptions (e.g., 404 Not Found).
@@ -88,7 +88,11 @@ abstract class SafeRepositoryDatasourceCallable<
       stackTrace,
       runtimeType.toString(),
     );
-    return const InadmissibleRepositoryError();
+    return InadmissibleRepositoryError(
+      message: exception.message,
+      statusCode: exception.statusCode,
+      body: exception.body,
+    );
   };
 
   /// Default handler for unexpected exceptions (e.g., parsing errors).
