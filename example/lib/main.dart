@@ -15,15 +15,18 @@ Future<void> main(List<String> args) async {
     ),
   );
 
-  final successfulDatasource =
-      GetUserDetailDatasource(driver: successfulDriver);
-  final successfulRepository =
-      GetUserDetailRepository(dataSource: successfulDatasource);
+  final successfulDatasource = GetUserDetailDatasource(
+    driver: successfulDriver,
+  );
+  final successfulRepository = GetUserDetailRepository(
+    dataSource: successfulDatasource,
+  );
 
   print('\n--- Successful request set ---');
 
-  final successfulResult =
-      await successfulRepository.call(repositoryParams: noParams);
+  final successfulResult = await successfulRepository.call(
+    repositoryParams: noParams,
+  );
 
   print('Result: $successfulResult');
   // Output: Right(User(name: Dart User))
@@ -46,8 +49,10 @@ Future<void> main(List<String> args) async {
   print('\n--- Throw/Error request set ---');
 
   final throwDriver = HttpDriver(
-    simulatedResponse:
-        const RequestResponse(statusCode: 404, originalResponse: null),
+    simulatedResponse: const RequestResponse(
+      statusCode: 404,
+      originalResponse: null,
+    ),
   );
 
   final throwDatasource = GetUserDetailDatasource(driver: throwDriver)
@@ -63,8 +68,9 @@ Future<void> main(List<String> args) async {
 
   print('\n--- Cache request set ---');
 
-  final cacheRepository =
-      GetUserCacheDetailRepository(dataSource: successfulDatasource);
+  final cacheRepository = GetUserCacheDetailRepository(
+    dataSource: successfulDatasource,
+  );
   successfulDatasource.count = 0;
 
   await cacheRepository.call(repositoryParams: noParams);

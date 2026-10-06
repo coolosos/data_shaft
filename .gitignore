@@ -1,7 +1,7 @@
 # Miscellaneous
 /coverage/
 **/coverage/
-**/*.dart_tool
+**/.dart_tool
 **/build
 *.class
 *.log
@@ -34,7 +34,7 @@ pubspec_overrides.yaml
 .idea
 
 .env
- 
+
 # FVM Version Cache
 .fvm/
  

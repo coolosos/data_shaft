@@ -9,6 +9,8 @@ import 'repository/mock/user_repository_mock.dart';
 import 'repository/repository_observer_test.dart';
 
 void main() {
+  tearDown(RepositoryObserverInstances.reset);
+
   test(
     'Full Flow: Remote -> DataSource -> Repository (Cache + Observer)',
     () async {
